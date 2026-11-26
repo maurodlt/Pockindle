@@ -43,10 +43,10 @@ export default function Dashboard() {
     {data && Object.keys(data.currencies).length === 0 && <div className="card empty">No accounts yet. <Link to="/account/new">Add an account →</Link></div>}
     {data && Object.entries(data.currencies).map(([currency, summary]) => <section key={currency} className="dashboard-section"><h3>{currency} · next {summary.months.length} months</h3>
       <div className="metric-grid">{[
-        ['This month revenue', summary.months[0].income],
+        ['This month income', summary.months[0].income],
         ['This month expenses', summary.months[0].spending],
         ['This month total', summary.months[0].income - summary.months[0].spending],
-        ['Average monthly revenue', summary.months.reduce((sum, row) => sum + row.income, 0) / summary.months.length],
+        ['Average monthly income', summary.months.reduce((sum, row) => sum + row.income, 0) / summary.months.length],
         ['Average monthly expenses', summary.averageMonthlySpending],
         ['Average monthly total', summary.months.reduce((sum, row) => sum + row.income - row.spending, 0) / summary.months.length]
       ].map(([label, amount], index) => <div key={label} className={`card metric${index === 2 || index === 5 ? ' accent' : ''}`}><span>{label}</span><strong>{amount.toFixed(2)}</strong><small>{currency}</small></div>)}</div>

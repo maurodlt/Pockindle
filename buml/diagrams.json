@@ -970,9 +970,33 @@
         {
           "role": "assistant",
           "content": "The Spec-Driven Agent finished with 2 unresolved blockers; the application is incomplete. You can run the generation again to finish the remaining changes."
+        },
+        {
+          "role": "user",
+          "content": "In the main menu, when we click on the Accounts or Entries the submenu appears, no problem. However, it should collapse when the user clicks elsewhere in the page."
+        },
+        {
+          "role": "assistant",
+          "content": "I'll update your existing app to make that change. It will use your own OpenAI key (`gpt-6-sol`).\n\nDo you want to continue?"
+        },
+        {
+          "role": "user",
+          "content": "continue with the generation"
+        },
+        {
+          "role": "assistant",
+          "content": "Generating your application from your specs\u2026"
+        },
+        {
+          "role": "assistant",
+          "content": "\u2705 Generated **37** files with BESSER's `generate_fastapi_backend` generator. **35%** of files were unchanged from the scaffold in this run. This measures file provenance, not correctness or requirements coverage. Top level: `README.md`, `backend`, `docker-compose.yml`, `frontend`. Use the **Download** button on the run card to save it."
+        },
+        {
+          "role": "assistant",
+          "content": "Spec-Driven Agent generation finished successfully."
         }
       ],
-      "updatedAt": "2026-11-26T13:12:13.552Z"
+      "updatedAt": "2026-11-26T13:28:14.217Z"
     },
     "attribution": {
       "attr_5urea2t1u_mwxfe8pu_37f": {
@@ -1085,7 +1109,7 @@
       }
     }
   },
-  "exportedAt": "2026-11-26T13:16:32.569Z",
+  "exportedAt": "2026-11-26T13:33:04.224Z",
   "version": "2.0.0",
   "editorVersion": "8.9.4"
 }

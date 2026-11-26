@@ -56,7 +56,7 @@ export function EntityList({ entity }) {
   function display(field, row) {
     const value = row[field.name === 'account' || field.name === 'category' ? `${field.name}_id` : field.name]
     if (field.name === 'category' && value != null) return categories.find(category => category.id === value)?.name || `#${value}`
-    if (field.conditional && row.expenseType !== field.conditional) return '—'
+    if ((field.conditional && row.expenseType !== field.conditional) || (field.incomeRecurring && !['FIXED', 'VARIABLE'].includes(row.incomeType))) return '—'
     return Array.isArray(value) ? value.join(', ') : value == null ? '—' : String(value)
   }
   return <main className="container"><div className="page-heading"><div><p className="eyebrow">YOUR FINANCES</p><h1>{config.label}</h1><p className="muted">Keep your financial picture up to date.</p></div>
@@ -93,9 +93,14 @@ export function EntityForm({ entity }) {
   const [newCategory, setNewCategory] = useState('')
   const [addingCategory, setAddingCategory] = useState(false)
   const categoryKind = entity === 'entry' ? (values.type_spec || 'income') : entity
-  const displayedFields = config.fields.filter(field => !field.conditional || values.expenseType === field.conditional).map(field => ({ ...field,
-    label: field.name === 'amount' && entity === 'expense' && values.expenseType === 'VARIABLE' ? 'This months amount' : field.label,
-    required: field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(values.expenseType || values.incomeType)) || (field.name === 'amount' && entity === 'expense' && values.expenseType !== 'VARIABLE') }))
+  const selectedType = entity === 'expense' ? values.expenseType : entity === 'income' ? values.incomeType : null
+  const displayedFields = config.fields.filter(field =>
+    ((entity !== 'expense' && entity !== 'income') || selectedType || !['amount', 'expectedValue', 'allowedDeviation', 'recurrenceIntervalMonths'].includes(field.name)) &&
+    (!field.conditional || values.expenseType === field.conditional) &&
+    (!field.incomeRecurring || ['FIXED', 'VARIABLE'].includes(values.incomeType))
+  ).map(field => ({ ...field,
+    label: field.name === 'amount' && ((entity === 'expense' && values.expenseType === 'VARIABLE') || (entity === 'income' && values.incomeType === 'VARIABLE')) ? 'This months amount' : field.label,
+    required: (field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(selectedType)) || (field.name === 'amount' && ((entity === 'expense' && values.expenseType !== 'VARIABLE') || (entity === 'income' && values.incomeType === 'EXTRAORDINARY')))) && !(field.name === 'amount' && selectedType === 'VARIABLE') }))
   async function createCategory() {
     if (!newCategory.trim()) return
     setAddingCategory(true); setError('')
@@ -127,7 +132,7 @@ export function EntityForm({ entity }) {
     {loading ? <p>Loading {config.singular.toLowerCase()}…</p> : <form className="card form" onSubmit={submit}>{displayedFields.map(field => <label key={field.name} className="field"><span>{field.label}{field.required && ' *'}</span>
       {field.type === 'multi' ? <div className="checks">{(options[field.source] || []).length === 0 ? <span className="muted">Create an {field.source === 'account' ? 'account' : 'account group'} first.</span> : options[field.source].map(option => <label key={option.id}><input type="checkbox" checked={(values[field.name] || []).includes(option.id)} onChange={event => setValues(current => ({ ...current, [field.name]: event.target.checked ? [...(current[field.name] || []), option.id] : current[field.name].filter(value => value !== option.id) }))}/>{option.name}</label>)}</div>
       : field.type === 'reference' || field.type === 'enum' ? <select value={values[field.name] ?? ''} required={field.required} onChange={event => setValues({ ...values, [field.name]: event.target.value })}>
-        {field.type === 'reference' ? <><option value="">Choose {field.label.toLowerCase()}</option>{(options[field.source] || []).filter(option => field.name !== 'category' || option.kind === (entity === 'entry' ? values.type_spec : entity)).map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</> : field.options.map(option => <option key={option} value={option}>{option === 'FIX' ? 'Fixed' : option === 'VARIABLE' ? 'Variable' : option === 'EXTRAORDINARY' ? 'Extraordinary' : option}</option>)}</select>
+        {field.type === 'reference' ? <><option value="">Choose {field.label.toLowerCase()}</option>{(options[field.source] || []).filter(option => field.name !== 'category' || option.kind === (entity === 'entry' ? values.type_spec : entity)).map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</> : <>{['expenseType', 'incomeType'].includes(field.name) && <option value="" disabled>Choose {field.label.toLowerCase()}</option>}{field.options.map(option => <option key={option} value={option}>{option === 'FIX' || option === 'FIXED' ? 'Fixed' : option === 'VARIABLE' ? 'Variable' : option === 'EXTRAORDINARY' ? 'Extraordinary' : option}</option>)}</>}</select>
       : <input type={field.type} value={values[field.name] ?? ''} required={field.required} min={field.min} step={field.type === 'number' ? field.step || 'any' : undefined} onChange={event => setValues({ ...values, [field.name]: event.target.value })}/>}
       {field.name === 'category' && (entity === 'income' || entity === 'expense') && <span className="inline-category"><input aria-label={`New ${entity} category name`} placeholder={`New ${entity} category`} value={newCategory} onChange={event => setNewCategory(event.target.value)} /><button type="button" className="button" disabled={addingCategory || !newCategory.trim()} onClick={createCategory}>{addingCategory ? 'Adding…' : 'Add category'}</button></span>}</label>)}
       <div className="form-actions"><button className="button" disabled={busy || (entity === 'accountgroup' && !(values.accounts || []).length)}>{busy ? 'Saving…' : id ? 'Save changes' : `Create ${config.singular.toLowerCase()}`}</button><Link to={`/${entity}`}>Cancel</Link></div>
