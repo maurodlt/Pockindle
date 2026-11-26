@@ -118,6 +118,8 @@ async def create_expense(expense_data: ExpenseCreate, database: Session = Depend
         related_category = database.query(Category).filter(Category.id == expense_data.category).first()
         if not related_category:
             raise HTTPException(status_code=400, detail="Category not found")
+        if related_category.kind != 'expense':
+            raise HTTPException(status_code=422, detail='Expense requires an expense category')
 
     db_expense = Expense(
         amount=expense_data.amount,        description=expense_data.description,        endDate=expense_data.endDate,        recurrenceIntervalMonths=expense_data.recurrenceIntervalMonths,        startDate=expense_data.startDate,        expenseType=expense_data.expenseType.name,        account_id=expense_data.account,        category_id=expense_data.category        )
@@ -146,8 +148,10 @@ async def bulk_create_expense(items: list[ExpenseCreate], database: Session = De
             # Basic validation for each item
             if not item_data.account:
                 raise ValueError("Account ID is required")
-            if item_data.category is not None and database.get(Category, item_data.category) is None:
+            if item_data.category is not None and (category := database.get(Category, item_data.category)) is None:
                 raise ValueError("Category not found")
+            if item_data.category is not None and category.kind != 'expense':
+                raise ValueError('Expense requires an expense category')
 
             db_expense = Expense(
                 amount=item_data.amount,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                expenseType=item_data.expenseType.name,                account_id=item_data.account,                category_id=item_data.category            )
@@ -215,6 +219,8 @@ async def update_expense(expense_id: int, expense_data: ExpenseCreate, database:
         related_id = getattr(expense_data, field)
         if (related_id is None and field == 'account') or (related_id is not None and database.get(model, related_id) is None):
             raise HTTPException(status_code=400, detail=f'{field.title()} not found')
+        if field == 'category' and related_id is not None and database.get(Category, related_id).kind != 'expense':
+            raise HTTPException(status_code=422, detail='Expense requires an expense category')
         setattr(db_expense, field + '_id', related_id)
     database.commit()
     database.refresh(db_expense)

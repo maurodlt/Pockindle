@@ -48,6 +48,24 @@ def occurrences(entry: Entry, first: date, last: date):
         index += 1
 
 
+def occurrences_at(start: date, interval: int | None, end: date | None, first: date, last: date):
+    """Project a transfer on its date and, optionally, every interval months."""
+    if start > last:
+        return
+    if interval is None:
+        if first <= start <= last and (end is None or start <= end):
+            yield start
+        return
+    index = max(0, ((first.year - start.year) * 12 + first.month - start.month) // interval - 1)
+    while True:
+        day = add_months(start, index * interval)
+        if day > last or (end is not None and day > end):
+            break
+        if day >= first:
+            yield day
+        index += 1
+
+
 def project(
     database: Session,
     accounts: list[Account],
@@ -79,17 +97,18 @@ def project(
         ).all() if account_ids else []
     )
     for transfer in transfers:
-        if not first_month <= transfer.date <= last:
-            continue
-        index = (transfer.date.year - today.year) * 12 + transfer.date.month - today.month
-        if transfer.fromAccount_id in account_ids:
-            source = next(a for a in accounts if a.id == transfer.fromAccount_id)
-            if transfer.date >= source.openingBalanceDate:
-                buckets[index]['spending'] += Decimal(str(transfer.amount))
-        if transfer.toAccount_id in account_ids:
-            destination = next(a for a in accounts if a.id == transfer.toAccount_id)
-            if transfer.date >= destination.openingBalanceDate:
-                buckets[index]['revenue'] += Decimal(str(transfer.amount))
+        # Transfers use the same monthly recurrence semantics as entries.
+        for day in occurrences_at(transfer.date, transfer.recurrenceIntervalMonths,
+                                  transfer.endDate, first_month, last):
+            index = (day.year - today.year) * 12 + day.month - today.month
+            if transfer.fromAccount_id in account_ids:
+                source = next(a for a in accounts if a.id == transfer.fromAccount_id)
+                if day >= source.openingBalanceDate:
+                    buckets[index]['spending'] += Decimal(str(transfer.amount))
+            if transfer.toAccount_id in account_ids:
+                destination = next(a for a in accounts if a.id == transfer.toAccount_id)
+                if day >= destination.openingBalanceDate:
+                    buckets[index]['revenue'] += Decimal(str(transfer.amount))
     balance = Decimal("0")
     result = []
     for index, bucket in enumerate(buckets):

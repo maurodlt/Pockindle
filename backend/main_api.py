@@ -213,7 +213,8 @@ def create_transfer(transfer: TransferCreate, database: Session = Depends(get_db
     if transfer.date < source.openingBalanceDate or transfer.date < destination.openingBalanceDate:
         raise HTTPException(status_code=422, detail='Transfer date must not precede either opening balance date')
     record = Transfer(fromAccount_id=source.id, toAccount_id=destination.id,
-                      amount=transfer.amount, date=transfer.date, description=transfer.description)
+                      amount=transfer.amount, date=transfer.date, description=transfer.description,
+                      recurrenceIntervalMonths=transfer.recurrenceIntervalMonths, endDate=transfer.endDate)
     database.add(record)
     database.commit()
     database.refresh(record)

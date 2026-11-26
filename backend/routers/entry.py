@@ -149,8 +149,12 @@ async def update_entry(entry_id: int, entry_data: EntryCreate, database: Session
         if not related_account:
             raise HTTPException(status_code=400, detail="Account not found")
         setattr(db_entry, 'account_id', entry_data.account)
-    if entry_data.category is not None and database.get(Category, entry_data.category) is None:
-        raise HTTPException(status_code=400, detail="Category not found")
+    if entry_data.category is not None:
+        category = database.get(Category, entry_data.category)
+        if category is None:
+            raise HTTPException(status_code=400, detail="Category not found")
+        if category.kind != db_entry.type_spec:
+            raise HTTPException(status_code=422, detail='Category type must match entry type')
     setattr(db_entry, 'category_id', entry_data.category)
     database.commit()
     database.refresh(db_entry)

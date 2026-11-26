@@ -52,6 +52,30 @@ def init_db():
                     connection.exec_driver_sql('PRAGMA writable_schema=OFF')
                 connection.exec_driver_sql('PRAGMA schema_version = ' + str(
                     connection.exec_driver_sql('PRAGMA schema_version').scalar() + 1))
+            category_columns = {col[1] for col in connection.exec_driver_sql('PRAGMA table_info(category)')}
+            if 'kind' not in category_columns:
+                connection.exec_driver_sql("ALTER TABLE category ADD COLUMN kind VARCHAR(10) NOT NULL DEFAULT 'expense'")
+                # Existing categories were shared; preserve their expense references,
+                # and give revenue references their own category records.
+                categories = connection.exec_driver_sql('SELECT id, name FROM category').fetchall()
+                for category_id, name in categories:
+                    if connection.exec_driver_sql(
+                        "SELECT 1 FROM entry WHERE category_id=? AND type_spec='revenue' LIMIT 1", (category_id,)
+                    ).first():
+                        result = connection.exec_driver_sql(
+                            "INSERT INTO category (name, kind) VALUES (?, 'revenue')", (name,))
+                        connection.exec_driver_sql(
+                            "UPDATE entry SET category_id=? WHERE category_id=? AND type_spec='revenue'",
+                            (result.lastrowid, category_id))
+                        if not connection.exec_driver_sql(
+                            'SELECT 1 FROM entry WHERE category_id=? LIMIT 1', (category_id,)
+                        ).first():
+                            connection.exec_driver_sql('DELETE FROM category WHERE id=?', (category_id,))
+            transfer_columns = {col[1] for col in connection.exec_driver_sql('PRAGMA table_info(transfer)')}
+            if 'recurrenceIntervalMonths' not in transfer_columns:
+                connection.exec_driver_sql('ALTER TABLE transfer ADD COLUMN "recurrenceIntervalMonths" INTEGER')
+            if 'endDate' not in transfer_columns:
+                connection.exec_driver_sql('ALTER TABLE transfer ADD COLUMN "endDate" DATE')
     return SessionLocal
 
 # Initialize database session

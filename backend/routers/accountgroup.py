@@ -131,6 +131,10 @@ async def create_accountgroup(accountgroup_data: AccountGroupCreate, database: S
 
     if not accountgroup_data.accounts or len(accountgroup_data.accounts) < 1:
         raise HTTPException(status_code=400, detail="At least 1 Account(s) required")
+    if len(set(accountgroup_data.accounts)) != len(accountgroup_data.accounts):
+        raise HTTPException(status_code=422, detail='Accounts cannot be repeated in a group')
+    if len({a.currency for a in database.query(Account).filter(Account.id.in_(accountgroup_data.accounts))}) > 1:
+        raise HTTPException(status_code=422, detail='Consolidated accounts must share a currency')
     if accountgroup_data.accounts:
         for id in accountgroup_data.accounts:
             # Entity already validated before creation
@@ -239,6 +243,10 @@ async def update_accountgroup(accountgroup_id: int, accountgroup_data: AccountGr
     if accountgroup_data.accounts is not None:
         if len(accountgroup_data.accounts) < 1:
             raise HTTPException(status_code=400, detail="At least 1 Account(s) required")
+        if len(set(accountgroup_data.accounts)) != len(accountgroup_data.accounts):
+            raise HTTPException(status_code=422, detail='Accounts cannot be repeated in a group')
+        if len({a.currency for a in database.query(Account).filter(Account.id.in_(accountgroup_data.accounts))}) > 1:
+            raise HTTPException(status_code=422, detail='Consolidated accounts must share a currency')
         existing_related_account_ids = [assoc._mapping["accounts"] for assoc in database.execute(
             groups.select().where(groups.c["groups"] == db_accountgroup.id))]
 
@@ -315,6 +323,8 @@ async def add_accounts_to_accountgroup(accountgroup_id: int, account_id: int, da
 
     if existing:
         raise HTTPException(status_code=400, detail="Relationship already exists")
+    if db_accountgroup.accounts and related_account.currency != db_accountgroup.accounts[0].currency:
+        raise HTTPException(status_code=422, detail='Consolidated accounts must share a currency')
 
     # Create the association
     association = groups.insert().values(groups=accountgroup_id, accounts=account_id)

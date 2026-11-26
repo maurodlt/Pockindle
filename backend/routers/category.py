@@ -113,7 +113,7 @@ async def create_category(category_data: CategoryCreate, database: Session = Dep
 
 
     db_category = Category(
-        name=category_data.name        )
+        name=category_data.name, kind=category_data.kind        )
 
     database.add(db_category)
     database.flush()
@@ -125,6 +125,8 @@ async def create_category(category_data: CategoryCreate, database: Session = Dep
             related_entry = database.query(Entry).filter(Entry.id == related_entry_id).first()
             if not related_entry:
                 raise HTTPException(status_code=400, detail=f"Entry with id {related_entry_id} not found")
+            if related_entry.type_spec != category_data.kind:
+                raise HTTPException(status_code=422, detail='Category type must match entry type')
 
         # Update the related entities with the new foreign key
         database.query(Entry).filter(Entry.id.in_(category_data.entries)).update(
@@ -157,7 +159,7 @@ async def bulk_create_category(items: list[CategoryCreate], database: Session = 
             # Basic validation for each item
 
             db_category = Category(
-                name=item_data.name            )
+                name=item_data.name, kind=item_data.kind            )
             database.add(db_category)
             database.flush()  # Get ID without committing
             created_items.append(db_category.id)
@@ -216,7 +218,10 @@ async def update_category(category_id: int, category_data: CategoryCreate, datab
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category not found")
 
+    if database.query(Entry).filter(Entry.category_id == category_id, Entry.type_spec != category_data.kind).first():
+        raise HTTPException(status_code=422, detail='Category type cannot conflict with its entries')
     setattr(db_category, 'name', category_data.name)
+    setattr(db_category, 'kind', category_data.kind)
     if category_data.entries is not None:
         requested_entries = set(category_data.entries)
         current_entries = {
@@ -233,6 +238,8 @@ async def update_category(category_id: int, category_data: CategoryCreate, datab
             related_entry = database.query(Entry).filter(Entry.id == related_entry_id).first()
             if not related_entry:
                 raise HTTPException(status_code=400, detail="Entry with id " + str(related_entry_id) + " not found")
+            if related_entry.type_spec != category_data.kind:
+                raise HTTPException(status_code=422, detail='Category type must match entry type')
         if entries_to_attach:
             database.query(Entry).filter(Entry.id.in_(entries_to_attach)).update(
                 {Entry.category_id: db_category.id}, synchronize_session=False

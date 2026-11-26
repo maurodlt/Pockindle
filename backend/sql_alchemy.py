@@ -115,12 +115,15 @@ class Transfer(Base):
     amount: Mapped_[float] = mapped_column(Float_, nullable=False)
     date: Mapped_[dt_date] = mapped_column(Date_, nullable=False)
     description: Mapped_[str] = mapped_column(String_(100), default="")
+    recurrenceIntervalMonths: Mapped_[Optional_[int]] = mapped_column(Integer_, nullable=True)
+    endDate: Mapped_[Optional_[dt_date]] = mapped_column(Date_, nullable=True)
 
 
 class Category(Base):
     __tablename__ = "category"
     id: Mapped_[int] = mapped_column(primary_key=True)
     name: Mapped_[str] = mapped_column(String_(100))
+    kind: Mapped_[str] = mapped_column(String_(10), nullable=False)
 
 class AccountGroup(Base):
     __tablename__ = "accountgroup"

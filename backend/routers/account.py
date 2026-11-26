@@ -146,6 +146,8 @@ async def create_account(account_data: AccountCreate, database: Session = Depend
             related_accountgroup = database.query(AccountGroup).filter(AccountGroup.id == id).first()
             if not related_accountgroup:
                 raise HTTPException(status_code=404, detail=f"AccountGroup with ID {id} not found")
+            if related_accountgroup.accounts and related_accountgroup.accounts[0].currency != account_data.currency:
+                raise HTTPException(status_code=422, detail='Consolidated accounts must share a currency')
 
     db_account = Account(
         currency=account_data.currency,        name=account_data.name,        openingBalance=account_data.openingBalance,        openingBalanceDate=account_data.openingBalanceDate        )
@@ -261,6 +263,15 @@ async def update_account(account_id: int, account_data: AccountCreate, database:
     if db_account is None:
         raise HTTPException(status_code=404, detail="Account not found")
 
+    if any(a.currency != account_data.currency for group in db_account.groups for a in group.accounts if a.id != db_account.id):
+        raise HTTPException(status_code=422, detail='Consolidated accounts must share a currency')
+    if database.query(Transfer.id).filter(
+        ((Transfer.fromAccount_id == account_id) & (Transfer.toAccount_id.in_(
+            database.query(Account.id).filter(Account.currency != account_data.currency)))) |
+        ((Transfer.toAccount_id == account_id) & (Transfer.fromAccount_id.in_(
+            database.query(Account.id).filter(Account.currency != account_data.currency))))
+    ).first():
+        raise HTTPException(status_code=422, detail='Transfer accounts must share a currency')
     setattr(db_account, 'currency', account_data.currency)
     setattr(db_account, 'name', account_data.name)
     setattr(db_account, 'openingBalance', account_data.openingBalance)
@@ -301,6 +312,8 @@ async def update_account(account_id: int, account_data: AccountCreate, database:
             related_accountgroup = database.query(AccountGroup).filter(AccountGroup.id == related_accountgroup_id).first()
             if related_accountgroup is None:
                 raise HTTPException(status_code=404, detail="AccountGroup with ID " + str(related_accountgroup_id) + " not found")
+            if related_accountgroup.accounts and related_accountgroup.accounts[0].currency != account_data.currency:
+                raise HTTPException(status_code=422, detail='Consolidated accounts must share a currency')
             association = groups.insert().values(groups=related_accountgroup.id, accounts=db_account.id)
             database.execute(association)
     database.commit()
@@ -378,6 +391,8 @@ async def add_groups_to_account(account_id: int, accountgroup_id: int, database:
 
     if existing:
         raise HTTPException(status_code=400, detail="Relationship already exists")
+    if related_accountgroup.accounts and db_account.currency != related_accountgroup.accounts[0].currency:
+        raise HTTPException(status_code=422, detail='Consolidated accounts must share a currency')
 
     # Create the association
     association = groups.insert().values(accounts=account_id, groups=accountgroup_id)

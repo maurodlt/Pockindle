@@ -19,7 +19,10 @@ export const entities = {
     { name: 'name', label: 'Name', type: 'text', required: true },
     { name: 'accounts', label: 'Accounts to consolidate', type: 'multi', source: 'account', required: true }
   ] },
-  category: { label: 'Categories', singular: 'Category', fields: [{ name: 'name', label: 'Name', type: 'text', required: true }] },
+  category: { label: 'Categories', singular: 'Category', fields: [
+    { name: 'name', label: 'Name', type: 'text', required: true },
+    { name: 'kind', label: 'For entries', type: 'enum', options: ['revenue', 'expense'], required: true }
+  ] },
   entry: { label: 'All entries', singular: 'Entry', fields: entryFields, readOnlyCreate: true },
   expense: { label: 'Expenses', singular: 'Expense', fields: [...entryFields,
     { name: 'expenseType', label: 'Expense type', type: 'enum', options: ['FIX', 'VARIABLE', 'EXTRAORDINARY'], required: true }] },

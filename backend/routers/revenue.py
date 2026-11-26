@@ -118,6 +118,8 @@ async def create_revenue(revenue_data: RevenueCreate, database: Session = Depend
         related_category = database.query(Category).filter(Category.id == revenue_data.category).first()
         if not related_category:
             raise HTTPException(status_code=400, detail="Category not found")
+        if related_category.kind != 'revenue':
+            raise HTTPException(status_code=422, detail='Revenue requires a revenue category')
 
     db_revenue = Revenue(
         amount=revenue_data.amount,        description=revenue_data.description,        endDate=revenue_data.endDate,        recurrenceIntervalMonths=revenue_data.recurrenceIntervalMonths,        startDate=revenue_data.startDate,        account_id=revenue_data.account,        category_id=revenue_data.category        )
@@ -146,8 +148,10 @@ async def bulk_create_revenue(items: list[RevenueCreate], database: Session = De
             # Basic validation for each item
             if not item_data.account:
                 raise ValueError("Account ID is required")
-            if item_data.category is not None and database.get(Category, item_data.category) is None:
+            if item_data.category is not None and (category := database.get(Category, item_data.category)) is None:
                 raise ValueError("Category not found")
+            if item_data.category is not None and category.kind != 'revenue':
+                raise ValueError('Revenue requires a revenue category')
 
             db_revenue = Revenue(
                 amount=item_data.amount,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                account_id=item_data.account,                category_id=item_data.category            )
@@ -214,6 +218,8 @@ async def update_revenue(revenue_id: int, revenue_data: RevenueCreate, database:
         related_id = getattr(revenue_data, field)
         if (related_id is None and field == 'account') or (related_id is not None and database.get(model, related_id) is None):
             raise HTTPException(status_code=400, detail=f'{field.title()} not found')
+        if field == 'category' and related_id is not None and database.get(Category, related_id).kind != 'revenue':
+            raise HTTPException(status_code=422, detail='Revenue requires a revenue category')
         setattr(db_revenue, field + '_id', related_id)
     database.commit()
     database.refresh(db_revenue)

@@ -1,5 +1,5 @@
 from datetime import datetime, date, time
-from typing import Any, List, Optional, Union, Set
+from typing import Any, List, Optional, Union, Set, Literal
 from enum import Enum
 from pydantic import BaseModel, field_validator, model_validator
 
@@ -61,6 +61,15 @@ class TransferCreate(BaseModel):
     amount: float
     date: date
     description: str = ''
+    recurrenceIntervalMonths: Optional[int] = None
+    endDate: Optional[date] = None
+
+    @field_validator('recurrenceIntervalMonths')
+    @classmethod
+    def positive_interval(cls, value):
+        if value is not None and value < 1:
+            raise ValueError('Recurrence interval must be at least one month')
+        return value
 
     @field_validator('amount')
     @classmethod
@@ -73,11 +82,14 @@ class TransferCreate(BaseModel):
     def different_accounts(self):
         if self.fromAccount == self.toAccount:
             raise ValueError('Transfer accounts must be different')
+        if self.endDate is not None and self.endDate < self.date:
+            raise ValueError('End date must not precede transfer date')
         return self
 
 
 class CategoryCreate(BaseModel):
     name: str
+    kind: Literal['revenue', 'expense']
     entries: Optional[List[int]] = None  # 1:N Relationship
 
 
