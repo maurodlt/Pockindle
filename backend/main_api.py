@@ -245,31 +245,32 @@ def delete_transfer(transfer_id: int, database: Session = Depends(get_db)):
 
 @app.get('/overview/overages/', tags=['System'])
 def expense_overages(database: Session = Depends(get_db)):
-    """Historical actual expense occurrences above their average plus deviation."""
+    """Historical expense overages and income shortfalls with recorded actuals."""
     from decimal import Decimal
     today = date.today()
     overrides = {(row.entry_id, row.date): row.amount for row in database.query(OccurrenceAmount).all()}
     result = []
-    for expense in database.query(Expense).all():
-        if expense.expectedValue is None or expense.allowedDeviation is None:
+    for entry in database.query(Entry).all():
+        if entry.type_spec not in ('expense', 'income') or entry.expectedValue is None or entry.allowedDeviation is None:
             continue
-        first = max(expense.startDate, expense.account.openingBalanceDate)
-        last = min(today, expense.endDate or today)
+        first = max(entry.startDate, entry.account.openingBalanceDate)
+        last = min(today, entry.endDate or today)
         if first > last:
             continue
-        threshold = Decimal(str(expense.expectedValue)) + Decimal(str(expense.allowedDeviation))
-        for day in occurrences(expense, first, last):
-            # A recurring fixed amount is the scheduled value, not an observed
-            # monthly actual. Only explicitly entered amounts establish overages.
-            actual = overrides.get((expense.id, day))
-            if actual is None and day == expense.startDate and expense.expenseType.value == 'VARIABLE' and expense.amount != expense.expectedValue:
-                # Legacy records stored the first month's actual on Entry.
-                actual = expense.amount
-            if actual is not None and Decimal(str(actual)) > threshold:
-                result.append({'id': expense.id, 'date': day, 'description': expense.description,
-                               'account_id': expense.account_id, 'category_id': expense.category_id,
-                               'amount': actual, 'expectedValue': expense.expectedValue,
-                               'allowedDeviation': expense.allowedDeviation, 'limit': float(threshold)})
+        deviation = Decimal(str(entry.allowedDeviation))
+        expected = Decimal(str(entry.expectedValue))
+        threshold = expected + deviation if entry.type_spec == 'expense' else expected - deviation
+        for day in occurrences(entry, first, last):
+            # Only amounts explicitly entered for a month establish an off-plan occurrence.
+            actual = overrides.get((entry.id, day))
+            if actual is None and day == entry.startDate and entry.amount is not None and entry.amount != entry.expectedValue:
+                actual = entry.amount
+            if actual is not None and (Decimal(str(actual)) > threshold if entry.type_spec == 'expense' else Decimal(str(actual)) < threshold):
+                result.append({'id': entry.id, 'kind': entry.type_spec, 'date': day,
+                               'description': entry.description, 'account_id': entry.account_id,
+                               'category_id': entry.category_id, 'amount': actual,
+                               'expectedValue': entry.expectedValue, 'allowedDeviation': entry.allowedDeviation,
+                               'limit': float(threshold)})
     return sorted(result, key=lambda row: (row['date'], row['id']), reverse=True)
 
 
@@ -364,6 +365,7 @@ def dashboard(months: int = 6, low_balance_threshold: float = 0, database: Sessi
         scheduled = [row for row in current_rows if row['account_id'] in ids]
         summary['todayBalance'] = sum(balance_on(a, today) for a in selected)
         summary['changeSinceLastMonth'] = summary['todayBalance'] - sum(balance_on(a, previous) for a in selected)
+        summary['balanceTrendDates'] = [add_months(today, -index).isoformat() for index in range(5, -1, -1)]
         summary['balanceTrend'] = [sum(balance_on(a, add_months(today, -index)) for a in selected) for index in range(5, -1, -1)]
         for item in summary['accounts']:
             account = next(a for a in selected if a.id == item['id'])
@@ -467,14 +469,16 @@ def dashboard(months: int = 6, low_balance_threshold: float = 0, database: Sessi
         typical = ordinary[len(ordinary) // 2] if ordinary else 0
         summary['bigUpcoming'] = sorted((row for row in upcoming if row['amount'] > typical and row['amount'] > 0),
                                         key=lambda row: -row['amount'])[:5]
-        # Only months in which these accounts were open and fixed expenses
-        # existed contribute to the historical monthly average.
-        fixed_history = [sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0
-                             for row in past if row['account_id'] in ids and row['kind'] == 'expense'
-                             and row['type'] in ('FIX', 'FIXED')) for past in prior_rows]
-        observed_fixed = [value for value in fixed_history if value > 0]
-        average_fixed = sum(observed_fixed) / len(observed_fixed) if observed_fixed else fixed
-        summary['emergencyCover'] = summary['todayBalance'] / average_fixed if average_fixed else None
+        # Average the last six months of scheduled fixed and variable costs.
+        # For variable expenses use the expected amount rather than an optional
+        # actual, so a missing monthly update does not reduce emergency cover.
+        cost_history = [sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0
+                            for row in past if row['account_id'] in ids and row['kind'] == 'expense'
+                            and row['type'] in ('FIX', 'FIXED', 'VARIABLE')) for past in prior_rows]
+        observed_costs = [value for value in cost_history if value > 0]
+        current_costs = summary['spendingTypes']['fixed'] + summary['spendingTypes']['variable']
+        average_costs = sum(observed_costs) / len(observed_costs) if observed_costs else current_costs
+        summary['emergencyCover'] = summary['todayBalance'] / average_costs if average_costs else None
     return {'asOf': today.isoformat(), 'currencies': by_currency}
 
 

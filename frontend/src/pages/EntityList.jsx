@@ -30,6 +30,8 @@ export function EntityList({ entity }) {
   const [monthlyError, setMonthlyError] = useState('')
   const [editingAmount, setEditingAmount] = useState(null)
   const [actual, setActual] = useState('')
+  const [editingExpected, setEditingExpected] = useState(null)
+  const [expectedAmount, setExpectedAmount] = useState('')
   const monthlyEntity = ['entry', 'income', 'expense'].includes(entity)
   function refreshMonthly() {
     if (!monthlyEntity) return
@@ -41,6 +43,12 @@ export function EntityList({ entity }) {
     try {
       await api(`/${row.kind}/${row.id}/occurrences/${row.date}/`, { method: 'PUT', body: JSON.stringify({ amount: Number(actual) }) })
       setEditingAmount(null); refreshMonthly()
+    } catch (e) { setMonthlyError(e.message) }
+  }
+  async function saveExpected(row) {
+    try {
+      await api(`/income/${row.id}/expected/`, { method: 'PUT', body: JSON.stringify({ expectedValue: Number(expectedAmount) }) })
+      setEditingExpected(null); refreshMonthly(); refresh()
     } catch (e) { setMonthlyError(e.message) }
   }
   function refresh() { setRows(null); setError(''); list(entity).then(setRows).catch(e => setError(e.message)) }
@@ -66,7 +74,7 @@ export function EntityList({ entity }) {
     {monthlyError && <p className="error" role="alert">{monthlyError}</p>}
     {monthly === null ? <p>Loading monthly entries…</p> : !monthly.length ? <p className="muted">No entries scheduled for this month.</p> : <div className="table-scroll"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Expected / amount</th><th>Account</th><th>Monthly amount</th></tr></thead><tbody>{monthly.map(row => <tr key={`${row.id}-${row.date}`} className={row.needsActual ? 'needs-actual' : ''}>
       <td>{row.date}</td><td>{row.type === 'FIX' ? 'Fixed' : row.type === 'FIXED' ? 'Fixed' : row.type === 'VARIABLE' ? 'Variable' : 'Extraordinary'}</td><td>{row.description}</td>
-      <td>{row.needsActual ? 'Actual amount pending' : row.amount.toFixed(2)}{row.expectedMinimum !== null && <small className="range">Expected range: {row.expectedMinimum.toFixed(2)} – {row.expectedMaximum.toFixed(2)}</small>}{row.needsActual && <small className="range">Enter the actual amount manually</small>}</td><td>#{row.account_id}</td>
+      <td>{row.needsActual ? 'Actual amount pending' : row.amount == null ? '—' : row.amount.toFixed(2)}{row.kind === 'income' && row.expectedValue != null && <span className="actual-editor">{editingExpected === row.id ? <><input aria-label="Expected income amount" type="number" min="0.01" step="any" value={expectedAmount} onChange={event => setExpectedAmount(event.target.value)}/><button className="text-button" disabled={!Number.isFinite(Number(expectedAmount)) || Number(expectedAmount) <= 0} onClick={() => saveExpected(row)}>Save expected</button><button className="text-button" onClick={() => setEditingExpected(null)}>Cancel</button></> : <button className="text-button" onClick={() => { setEditingExpected(row.id); setExpectedAmount(String(row.expectedValue)) }}>Expected: {row.expectedValue.toFixed(2)} · Edit</button>}</span>}{row.expectedMinimum != null && <small className="range">Expected range: {row.expectedMinimum.toFixed(2)} – {row.expectedMaximum.toFixed(2)}</small>}{row.needsActual && <small className="range">Enter the actual amount manually</small>}</td><td>#{row.account_id}</td>
       <td>{editingAmount === `${row.id}-${row.date}` ? <span className="actual-editor"><input aria-label="Monthly amount" type="number" min="0.01" step="any" value={actual} onChange={event => setActual(event.target.value)}/><button className="text-button" disabled={!Number(actual) || Number(actual) <= 0} onClick={() => saveActual(row)}>Save</button><button className="text-button" onClick={() => setEditingAmount(null)}>Cancel</button></span> : !['income', 'expense'].includes(row.kind) ? '—' : <button className="text-button" onClick={() => { setEditingAmount(`${row.id}-${row.date}`); setActual(row.amount == null ? '' : String(row.amount)) }}>{row.kind === 'income' ? (row.overridden ? 'Change monthly income' : 'Set monthly income') : (row.overridden ? 'Change actual' : 'Set actual')}</button>}</td>
     </tr>)}</tbody></table></div>}</section>}
   {error && <p className="error" role="alert">{error}</p>}

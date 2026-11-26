@@ -49,6 +49,17 @@ def monthly_rows(database: Session, kind: str, month: str):
     return sorted(result, key=lambda row: (order.get(row['type'], 2), row['date'], row['id']))
 
 
+class ExpectedEdit(BaseModel):
+    expectedValue: float
+
+    @field_validator('expectedValue')
+    @classmethod
+    def positive(cls, value):
+        if not isfinite(value) or value <= 0:
+            raise ValueError('Expected amount must be positive and finite')
+        return value
+
+
 class AmountEdit(BaseModel):
     amount: float
 
@@ -65,6 +76,16 @@ def month_entries(kind: str, month: str, database: Session = Depends(get_db)):
     if kind not in ('entry', 'income', 'expense'):
         raise HTTPException(status_code=404, detail='Unknown entry kind')
     return monthly_rows(database, kind, month)
+
+
+@router.put('/income/{entry_id}/expected/', tags=['Monthly entries'])
+def edit_income_expected(entry_id: int, edit: ExpectedEdit, database: Session = Depends(get_db)):
+    record = database.get(Income, entry_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail='Income not found')
+    record.expectedValue = edit.expectedValue
+    database.commit()
+    return {'id': record.id, 'expectedValue': record.expectedValue}
 
 
 @router.put('/{kind}/{entry_id}/occurrences/{day}/', tags=['Monthly entries'])
