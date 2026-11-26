@@ -1,0 +1,50 @@
+{
+  "project": {
+    "id": "80799fab-004b-46e2-82e6-362b22b7d1eb",
+    "type": "Project",
+    "schemaVersion": 6,
+    "name": "finance_manager",
+    "description": "",
+    "owner": "BESSER User",
+    "createdAt": "2026-11-26T10:29:44.200Z",
+    "currentDiagramType": "ClassDiagram",
+    "currentDiagramIndices": {
+      "ClassDiagram": 0,
+      "ObjectDiagram": 0,
+      "StateMachineDiagram": 0,
+      "AgentDiagram": 0,
+      "ComponentDiagram": 0,
+      "DeploymentDiagram": 0,
+      "UserDiagram": 0,
+      "GUINoCodeDiagram": 0,
+      "KnowledgeGraphDiagram": 0,
+      "QuantumCircuitDiagram": 0,
+      "NNDiagram": 0,
+      "BPMN": 0
+    },
+    "diagrams": {},
+    "settings": {
+      "defaultDiagramType": "ClassDiagram",
+      "autoSave": true,
+      "collaborationEnabled": false,
+      "perspectives": {
+        "ClassDiagram": true,
+        "ObjectDiagram": true,
+        "StateMachineDiagram": true,
+        "AgentDiagram": true,
+        "UserDiagram": true,
+        "GUINoCodeDiagram": true,
+        "QuantumCircuitDiagram": true,
+        "NNDiagram": true,
+        "BPMN": true,
+        "ComponentDiagram": true,
+        "DeploymentDiagram": true,
+        "KnowledgeGraphDiagram": true
+      },
+      "preferredInterface": "agent"
+    }
+  },
+  "exportedAt": "2026-11-26T10:29:45.436Z",
+  "version": "2.0.0",
+  "editorVersion": "8.9.4"
+}
