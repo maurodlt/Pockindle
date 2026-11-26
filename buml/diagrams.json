@@ -946,9 +946,33 @@
         {
           "role": "assistant",
           "content": "Spec-Driven Agent generation finished successfully."
+        },
+        {
+          "role": "user",
+          "content": "The income and expenses monthly table view, instead of a string, the user should be able to select a month based on a list. He should be able to choose the year from 2026 until 2036 and the month from the list of months"
+        },
+        {
+          "role": "assistant",
+          "content": "I'll update your existing app to make that change. It will use your own OpenAI key (`gpt-6-sol`).\n\nDo you want to continue?"
+        },
+        {
+          "role": "user",
+          "content": "continue with the generation"
+        },
+        {
+          "role": "assistant",
+          "content": "Generating your application from your specs\u2026"
+        },
+        {
+          "role": "assistant",
+          "content": "\u26a0\ufe0f Generated **37** files with BESSER's `generate_fastapi_backend` generator, but **1 rule you asked for is not enforced in the delivered code** \u2014 the run card lists it and why. 2 checks could not be verified. Top level: `README.md`, `backend`, `docker-compose.yml`, `frontend`. Use the **Download** button on the run card to save the code as-is."
+        },
+        {
+          "role": "assistant",
+          "content": "The Spec-Driven Agent finished with 2 unresolved blockers; the application is incomplete. You can run the generation again to finish the remaining changes."
         }
       ],
-      "updatedAt": "2026-11-26T13:00:07.045Z"
+      "updatedAt": "2026-11-26T13:12:13.552Z"
     },
     "attribution": {
       "attr_5urea2t1u_mwxfe8pu_37f": {
@@ -1061,7 +1085,7 @@
       }
     }
   },
-  "exportedAt": "2026-11-26T13:00:59.242Z",
+  "exportedAt": "2026-11-26T13:16:32.569Z",
   "version": "2.0.0",
   "editorVersion": "8.9.4"
 }

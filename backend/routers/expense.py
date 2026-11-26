@@ -127,12 +127,8 @@ async def create_expense(expense_data: ExpenseCreate, database: Session = Depend
 
     database.add(db_expense)
     database.flush()
-    database.refresh(db_expense)
-
-
-
-
-
+    if expense_data.expenseType == ExpenseType.VARIABLE and expense_data.amount is not None:
+        database.add(OccurrenceAmount(entry_id=db_expense.id, date=db_expense.startDate, amount=expense_data.amount))
     database.commit()
     database.refresh(db_expense)
     return db_expense
@@ -158,6 +154,8 @@ async def bulk_create_expense(items: list[ExpenseCreate], database: Session = De
                 amount=item_data.amount if item_data.amount is not None else item_data.expectedValue,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                expenseType=item_data.expenseType.name,                expectedValue=item_data.expectedValue,                allowedDeviation=item_data.allowedDeviation,                account_id=item_data.account,                category_id=item_data.category            )
             database.add(db_expense)
             database.flush()  # Get ID without committing
+            if item_data.expenseType == ExpenseType.VARIABLE and item_data.amount is not None:
+                database.add(OccurrenceAmount(entry_id=db_expense.id, date=db_expense.startDate, amount=item_data.amount))
             created_items.append(db_expense.id)
         except ValueError as e:
             errors.append({"index": idx, "error": str(e)})
@@ -226,6 +224,15 @@ async def update_expense(expense_id: int, expense_data: ExpenseCreate, database:
         if field == 'category' and related_id is not None and database.get(Category, related_id).kind != 'expense':
             raise HTTPException(status_code=422, detail='Expense requires an expense category')
         setattr(db_expense, field + '_id', related_id)
+    if expense_data.expenseType == ExpenseType.VARIABLE:
+        initial = database.get(OccurrenceAmount, (expense_id, expense_data.startDate))
+        if expense_data.amount is not None:
+            if initial is None:
+                database.add(OccurrenceAmount(entry_id=expense_id, date=expense_data.startDate, amount=expense_data.amount))
+            else:
+                initial.amount = expense_data.amount
+        elif initial is not None:
+            database.delete(initial)
     database.commit()
     database.refresh(db_expense)
 

@@ -24,7 +24,8 @@ export function EntityList({ entity }) {
   const [error, setError] = useState('')
   const [selected, setSelected] = useState(null)
   const [categories, setCategories] = useState([])
-  const [month, setMonth] = useState(() => new Date().toLocaleDateString('en-CA').slice(0, 7))
+  const [month, setMonth] = useState(() => new Date().getMonth() + 1)
+  const [year, setYear] = useState(() => Math.min(2036, Math.max(2026, new Date().getFullYear())))
   const [monthly, setMonthly] = useState(null)
   const [monthlyError, setMonthlyError] = useState('')
   const [editingAmount, setEditingAmount] = useState(null)
@@ -33,9 +34,9 @@ export function EntityList({ entity }) {
   function refreshMonthly() {
     if (!monthlyEntity) return
     setMonthly(null); setMonthlyError('')
-    api(`/${entity}/monthly/?month=${month}`).then(setMonthly).catch(e => setMonthlyError(e.message))
+    api(`/${entity}/monthly/?month=${year}-${String(month).padStart(2, '0')}`).then(setMonthly).catch(e => setMonthlyError(e.message))
   }
-  useEffect(refreshMonthly, [entity, month])
+  useEffect(refreshMonthly, [entity, month, year])
   async function saveActual(row) {
     try {
       await api(`/${row.kind}/${row.id}/occurrences/${row.date}/`, { method: 'PUT', body: JSON.stringify({ amount: Number(actual) }) })
@@ -61,7 +62,7 @@ export function EntityList({ entity }) {
   return <main className="container"><div className="page-heading"><div><p className="eyebrow">YOUR FINANCES</p><h1>{config.label}</h1><p className="muted">Keep your financial picture up to date.</p></div>
     {!config.readOnlyCreate && <Link className="button" to={`/${entity}/new`}>+ New {config.singular.toLowerCase()}</Link>}
   </div>
-  {monthlyEntity && <section className="card"><div className="month-heading"><h2>Monthly entries</h2><label className="field">Month <input type="month" value={month} onChange={event => setMonth(event.target.value)} /></label></div>
+  {monthlyEntity && <section className="card"><div className="month-heading"><h2>Monthly entries</h2><div className="month-selectors"><label className="field">Month <select value={month} onChange={event => setMonth(Number(event.target.value))}>{Array.from({ length: 12 }, (_, index) => <option key={index + 1} value={index + 1}>{new Intl.DateTimeFormat('en', { month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, index, 1)))}</option>)}</select></label><label className="field">Year <select value={year} onChange={event => setYear(Number(event.target.value))}>{Array.from({ length: 11 }, (_, index) => <option key={2026 + index} value={2026 + index}>{2026 + index}</option>)}</select></label></div></div>
     {monthlyError && <p className="error" role="alert">{monthlyError}</p>}
     {monthly === null ? <p>Loading monthly entries…</p> : !monthly.length ? <p className="muted">No entries scheduled for this month.</p> : <div className="table-scroll"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Expected / amount</th><th>Account</th><th>Monthly amount</th></tr></thead><tbody>{monthly.map(row => <tr key={`${row.id}-${row.date}`} className={row.needsActual ? 'needs-actual' : ''}>
       <td>{row.date}</td><td>{row.type === 'FIX' ? 'Fixed' : row.type === 'FIXED' ? 'Fixed' : row.type === 'VARIABLE' ? 'Variable' : 'Extraordinary'}</td><td>{row.description}</td>
@@ -93,7 +94,7 @@ export function EntityForm({ entity }) {
   const [addingCategory, setAddingCategory] = useState(false)
   const categoryKind = entity === 'entry' ? (values.type_spec || 'income') : entity
   const displayedFields = config.fields.filter(field => !field.conditional || values.expenseType === field.conditional).map(field => ({ ...field,
-    label: field.name === 'amount' && entity === 'expense' && values.expenseType === 'VARIABLE' ? 'This month’s amount' : field.label,
+    label: field.name === 'amount' && entity === 'expense' && values.expenseType === 'VARIABLE' ? 'This months amount' : field.label,
     required: field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(values.expenseType || values.incomeType)) || (field.name === 'amount' && entity === 'expense' && values.expenseType !== 'VARIABLE') }))
   async function createCategory() {
     if (!newCategory.trim()) return

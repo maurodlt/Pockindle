@@ -29,8 +29,8 @@ def monthly_rows(database: Session, kind: str, month: str):
             overridden = (record.id, day) in overrides
             variable = isinstance(record, Expense) and record.expenseType.value == 'VARIABLE'
             expected = record.expectedValue if variable else (record.expectedValue if isinstance(record, Income) and record.expectedValue is not None else record.amount)
-            amount = overrides.get((record.id, day), record.amount if day == record.startDate and record.amount is not None else expected)
-            needs_actual = variable and not overridden and (day != record.startDate or record.amount is None)
+            amount = overrides.get((record.id, day), record.amount if day == record.startDate and record.amount is not None and not variable else expected)
+            needs_actual = variable and not overridden
             if needs_actual:
                 amount = None
             result.append({

@@ -259,12 +259,11 @@ def expense_overages(database: Session = Depends(get_db)):
             continue
         threshold = Decimal(str(expense.expectedValue)) + Decimal(str(expense.allowedDeviation))
         for day in occurrences(expense, first, last):
-            # The first month's entered amount and explicit monthly edits are
-            # actuals; later unedited variable months are only estimates.
+            # A recurring fixed amount is the scheduled value, not an observed
+            # monthly actual. Only explicitly entered amounts establish overages.
             actual = overrides.get((expense.id, day))
-            if actual is None and day == expense.startDate and expense.amount != expense.expectedValue:
-                actual = expense.amount
-            if actual is None and expense.expenseType.value == 'FIX':
+            if actual is None and day == expense.startDate and expense.expenseType.value == 'VARIABLE' and expense.amount != expense.expectedValue:
+                # Legacy records stored the first month's actual on Entry.
                 actual = expense.amount
             if actual is not None and Decimal(str(actual)) > threshold:
                 result.append({'id': expense.id, 'date': day, 'description': expense.description,
