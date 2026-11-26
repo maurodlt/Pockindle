@@ -274,7 +274,9 @@ def expense_overages(database: Session = Depends(get_db)):
 
 
 @app.get('/dashboard/', tags=['System'])
-def dashboard(months: int = 6, database: Session = Depends(get_db)):
+def dashboard(months: int = 6, low_balance_threshold: float = 0, database: Session = Depends(get_db)):
+    if low_balance_threshold < 0:
+        raise HTTPException(status_code=422, detail='Low balance threshold must not be negative')
     if not 1 <= months <= 60:
         raise HTTPException(status_code=422, detail='Months must be between 1 and 60')
     accounts = database.query(Account).all()
@@ -324,7 +326,156 @@ def dashboard(months: int = 6, database: Session = Depends(get_db)):
             kind: [{'name': name, 'amount': float(amount)} for name, amount in sorted(values.items())]
             for kind, values in chart.items()
         }
-    return {'asOf': date.today().isoformat(), 'currencies': by_currency}
+    from cashflow import add_months, occurrences_at
+    from monthly import monthly_rows
+    from datetime import timedelta
+    today = date.today()
+    previous = add_months(today, -1)
+    horizon = today + timedelta(days=14)
+    all_transfers = database.query(Transfer).all()
+
+    def balance_on(account, day):
+        """Opening balance plus scheduled activity through the given day."""
+        if day < account.openingBalanceDate:
+            return 0.0
+        balance = Decimal(str(account.openingBalance))
+        for entry in entries:
+            if entry.account_id != account.id:
+                continue
+            for occurrence in occurrences(entry, account.openingBalanceDate, day):
+                expected = getattr(entry, 'expectedValue', None)
+                amount = overrides.get((entry.id, occurrence))
+                if amount is None:
+                    amount = entry.amount if occurrence == entry.startDate and entry.amount is not None else expected if expected is not None else entry.amount
+                balance += Decimal(str(amount or 0)) * (1 if entry.type_spec == 'income' else -1)
+        for transfer in all_transfers:
+            if account.id not in (transfer.fromAccount_id, transfer.toAccount_id):
+                continue
+            for occurrence in occurrences_at(transfer.date, transfer.recurrenceIntervalMonths, transfer.endDate, account.openingBalanceDate, day):
+                balance += Decimal(str(transfer.amount)) * (1 if account.id == transfer.toAccount_id else -1)
+        return float(balance)
+
+    current_rows = monthly_rows(database, 'entry', today.strftime('%Y-%m'))
+    prior_rows = [monthly_rows(database, 'entry', add_months(today, -index).strftime('%Y-%m')) for index in range(1, 7)]
+    for currency, summary in by_currency.items():
+        selected = [a for a in accounts if a.currency == currency]
+        ids = {a.id for a in selected}
+        rows = [row for row in current_rows if row['account_id'] in ids and row['date'] <= today]
+        scheduled = [row for row in current_rows if row['account_id'] in ids]
+        summary['todayBalance'] = sum(balance_on(a, today) for a in selected)
+        summary['changeSinceLastMonth'] = summary['todayBalance'] - sum(balance_on(a, previous) for a in selected)
+        summary['balanceTrend'] = [sum(balance_on(a, add_months(today, -index)) for a in selected) for index in range(5, -1, -1)]
+        for item in summary['accounts']:
+            account = next(a for a in selected if a.id == item['id'])
+            item['todayBalance'] = balance_on(account, today)
+            item['balanceTrend'] = [balance_on(account, add_months(today, -index)) for index in range(5, -1, -1)]
+        def actual(row):
+            return row['amount'] if not row['needsActual'] else None
+        income_expected = sum(row['expectedValue'] or 0 for row in rows if row['kind'] == 'income')
+        expense_planned = sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0 for row in rows if row['kind'] == 'expense')
+        recorded = {(entry_id, day) for entry_id, day in overrides}
+        def occurred(row):
+            entry = next(e for e in entries if e.id == row['id'])
+            return (row['id'], row['date']) in recorded or (row['date'] == entry.startDate and entry.amount is not None)
+        received = sum(actual(row) or 0 for row in rows if row['kind'] == 'income' and occurred(row))
+        spent = sum(actual(row) or 0 for row in rows if row['kind'] == 'expense' and occurred(row))
+        fixed = sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0 for row in scheduled if row['kind'] == 'expense' and row['type'] in ('FIX', 'FIXED'))
+        expected_month_income = sum(row['expectedValue'] or 0 for row in scheduled if row['kind'] == 'income')
+        summary['monthToDate'] = {'incomeReceived': received, 'incomeExpected': income_expected,
+                                  'expensesSpent': spent, 'expensesPlanned': expense_planned,
+                                  'leftToSpend': expected_month_income - fixed - spent, 'fixedCosts': fixed,
+                                  'monthlyIncomeExpected': expected_month_income}
+        summary['missingAmounts'] = [{'id': row['id'], 'kind': row['kind'], 'description': row['description'], 'date': row['date']}
+                                     for row in rows if row['needsActual'] and row['type'] == 'VARIABLE']
+        timeline = []
+        for entry in entries:
+            if entry.account_id not in ids:
+                continue
+            account = next(a for a in selected if a.id == entry.account_id)
+            for day in occurrences(entry, max(today, account.openingBalanceDate), horizon):
+                expected = getattr(entry, 'expectedValue', None)
+                amount = overrides.get((entry.id, day), entry.amount if day == entry.startDate and entry.amount is not None else expected if expected is not None else entry.amount)
+                timeline.append({'date': day.isoformat(), 'description': entry.description, 'kind': entry.type_spec,
+                                 'amount': amount or 0, 'account': account.name, 'account_id': account.id,
+                                 'canCover': entry.type_spec != 'expense' or balance_on(account, day) >= 0})
+        summary['timeline'] = sorted(timeline, key=lambda row: (row['date'], row['description']))
+        alerts = []
+        for kind, items in (('account', summary['accounts']), ('group', summary['groups'])):
+            for item in items:
+                first_low = next((row for row in item['months'] if row['endBalance'] < low_balance_threshold), None)
+                if first_low:
+                    alerts.append({'name': item['name'], 'month': first_low['month'], 'balance': first_low['endBalance'],
+                                   'threshold': low_balance_threshold, 'kind': kind, 'id': item['id']})
+        summary['lowBalances'] = sorted(alerts, key=lambda row: (row['month'], row['balance']))
+        summary['lowBalance'] = summary['lowBalances'][0] if alerts else None
+        if summary['lowBalance'] and summary['lowBalance']['kind'] == 'account':
+            candidate = next((a for a in summary['accounts'] if a['id'] != summary['lowBalance']['id']
+                              and next((m['endBalance'] for m in a['months'] if m['month'] == summary['lowBalance']['month']), 0) > -summary['lowBalance']['balance']), None)
+            summary['lowBalance']['transferFrom'] = candidate['name'] if candidate else None
+        off_plan = []
+        for row in rows:
+            if row['amount'] is None or not occurred(row):
+                continue
+            limit = row['expectedMaximum'] if row['kind'] == 'expense' else row['expectedMinimum']
+            if limit is not None:
+                difference = row['amount'] - limit if row['kind'] == 'expense' else limit - row['amount']
+                if difference > 0:
+                    off_plan.append({'description': row['description'], 'kind': row['kind'], 'difference': difference, 'date': row['date']})
+        summary['offPlan'] = {'count': len(off_plan), 'worst': max(off_plan, key=lambda row: row['difference']) if off_plan else None}
+        summary['spendingTypes'] = {kind: sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0 for row in scheduled if row['kind'] == 'expense' and row['type'] in types)
+                                    for kind, types in [('fixed', ('FIX', 'FIXED')), ('variable', ('VARIABLE',)), ('extraordinary', ('EXTRAORDINARY',))]}
+        category_names = {c.id: c.name for c in database.query(Category).all()}
+        current_categories = {}
+        for row in scheduled:
+            if row['kind'] == 'expense':
+                name = category_names.get(row['category_id'], 'Uncategorized')
+                current_categories[name] = current_categories.get(name, 0) + (row['amount'] if row['amount'] is not None else row['expectedValue'] or 0)
+        history = []
+        for past in prior_rows:
+            totals = {}
+            for row in past:
+                if row['account_id'] in ids and row['kind'] == 'expense':
+                    name = category_names.get(row['category_id'], 'Uncategorized')
+                    totals[name] = totals.get(name, 0) + (row['amount'] if row['amount'] is not None else row['expectedValue'] or 0)
+            history.append(totals)
+        summary['categoryComparison'] = [{'name': name, 'current': value,
+                                           'average': sum(past.get(name, 0) for past in history) / len(history)}
+                                          for name, value in sorted(current_categories.items())]
+        summary['recurringCosts'] = sorted([{'description': e.description, 'yearly': (e.expectedValue or e.amount or 0) * 12 / e.recurrenceIntervalMonths,
+                                              'monthly': (e.expectedValue or e.amount or 0) / e.recurrenceIntervalMonths}
+                                             for e in entries if e.account_id in ids and e.type_spec == 'expense' and e.recurrenceIntervalMonths],
+                                            key=lambda item: -item['yearly'])
+        summary['endingSoon'] = [{'description': e.description, 'endDate': e.endDate.isoformat(),
+                                  'monthlyChange': (e.expectedValue if e.expectedValue is not None else e.amount or 0) / (e.recurrenceIntervalMonths or 1) * (1 if e.type_spec == 'expense' else -1)}
+                                 for e in entries if e.account_id in ids and e.recurrenceIntervalMonths and e.endDate
+                                 and today <= e.endDate <= add_months(today, 3)
+                                 and any(True for _ in occurrences(e, today, e.endDate))]
+        summary['savingsRates'] = [{'month': row['month'], 'rate': (row['income'] - row['spending']) / row['income'] * 100 if row['income'] else None} for row in summary['months']]
+        future = add_months(today, 12)
+        upcoming = []
+        for e in entries:
+            if e.account_id not in ids or e.type_spec != 'expense' or e.recurrenceIntervalMonths not in (None, 12):
+                continue
+            for day in occurrences(e, today, future):
+                amount = e.expectedValue or e.amount or 0
+                upcoming.append({'description': e.description, 'date': day.isoformat(), 'amount': amount,
+                                 'monthlySetAside': amount / max(1, (day.year - today.year) * 12 + day.month - today.month + 1)})
+        # Compare with a month's ordinary recurring costs, rather than an arbitrary
+        # number of items or an unrequested absolute currency threshold.
+        ordinary = sorted((row['yearly'] / 12 for row in summary['recurringCosts']
+                           if row['monthly'] > 0 and row['yearly'] / 12 > 0))
+        typical = ordinary[len(ordinary) // 2] if ordinary else 0
+        summary['bigUpcoming'] = sorted((row for row in upcoming if row['amount'] > typical and row['amount'] > 0),
+                                        key=lambda row: -row['amount'])[:5]
+        # Only months in which these accounts were open and fixed expenses
+        # existed contribute to the historical monthly average.
+        fixed_history = [sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0
+                             for row in past if row['account_id'] in ids and row['kind'] == 'expense'
+                             and row['type'] in ('FIX', 'FIXED')) for past in prior_rows]
+        observed_fixed = [value for value in fixed_history if value > 0]
+        average_fixed = sum(observed_fixed) / len(observed_fixed) if observed_fixed else fixed
+        summary['emergencyCover'] = summary['todayBalance'] / average_fixed if average_fixed else None
+    return {'asOf': today.isoformat(), 'currencies': by_currency}
 
 
 @app.get("/statistics", tags=["System"])

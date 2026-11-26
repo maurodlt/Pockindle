@@ -1,5 +1,5 @@
 {
-  "instructions": "## Assistant's notes (may be inaccurate)\n\nUse these only for choices the user confirmed in the conversation that are missing from their request below. Never add a feature, database, framework, tool or deployment step that is not in the user's request; where these notes disagree with it, the user's request wins.\n\nUpdate the existing generated app so the Accounts and Entries submenus in the main menu collapse when the user clicks elsewhere on the page. Preserve their current behavior when clicked.\n\n## The user's original request, verbatim\n\nThis is the authority. Where the summary above is shorter or differs, this text wins.\n\nI would like to create an app to manage my personal finance. I would like to be able to add my revenues, my fix, variable, and extraordinary expenses. Then, the app should be able to calculate my monthly cashflow indicating how much money I will have in my account in the end of the current and following months. \n\nThe app should allow me to have multiple accounts entered in parallel. Consequently, I would like to able to check the cashflow in each account separately and in a set of accounts as well (as if they were a single account). Note, I would like to be able to decide which accounts to consolidate into a single view. \n\nI should be able to classify each revenue and expense by its category. \n\nThe app should be visually pleasant and easy to use. \n\nI would also like to have a dashboard showing to me the most relevant information from my spendings on the current month, the ones to follow, and my averge spending.\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nI would like to update the app.\n\n- Categories should not be mandatory. \n- I should be able to transfer money from one account to another one.\n- In the dashboard, you can remove the main \"Feel at home...\" card. \n- In the dashboard, the \"Following months\u2019 spending\" should actually be removed\n- In the dashboard, there should be a widget with two pie charts showing the categories of the revenues and the expenses.\n- The table in the dashboard should be colored based if I ended the month with positive or negative total in that month, and in general. \n- The user should be able to select which table to show in the dashboard, giving the options: individual accounts, groups, total\n- Rename the app to \"Pockindle\"\n- Currency code should come from a list including EUR, BRL, USD\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nA few more updates:\n- Transfers should also have the options to be repeated.\n- When choosing the category for expenses/revenue, the user should be able to include new categories from that page directly.\n- Revenue and expenses should have different categories. \n- The menu should be updated. There should be: Overview; Accounts -> (Individual Accounts/ Groups); Entries -> (All entries, Revenue, Expenses, Transfers, Categories)\n- In the dashboard, we should have the cards (in this order) -> This month revenue, This month expenses, This month total, Average monthly revenue, average monthly expenses, average monthly total\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nRefactor the app to replace \"Revenue\" by \"Income\".\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nPlease update:\n- \"Repeat every x months\" should be mandatory for fixed and variable expenses. 0 should not be accepted.\n- For variable expenses, one should enter the expected value for that expense and a value that is \"ok\" to deviate from. expected value +- deviation.\n- Expenses should be visualized monthly, The fixed on top, then variable, then extraordinary. Every month, the fixed and variable expenses should be brought to the new month if they will be considered that month. The variable ones should be colored in yellow to showcase the user that he should manually update it to the correct value (instead of showing the expected one). \n- Income should also come as fixed, variable and extraordinary.\n- Similar to expenses, income should also be shown by month and the expected should also be able to be changed as well.\n\n\n\nFor both the income and expenses I would like to be able to have a monthly view on the entries. Fo\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\n- Expense type should be entered before the amount. With that, if chosen variable, the amount should be named \"This months amount\" and should be optional. \n- The same as the expenses also counts for the income. The user should be able to first select the type of income, then enter the average and deviation value, and if he wants, the value for the current month.\n- There should be no check when updating the monthly value to guarantee if the income or expense on that month is outside the range stipulated.\n- In the overview page, there should be a list with all times one expense was above the stipulated monthly value (average + variation).\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nThe income and expenses monthly table view, instead of a string, the user should be able to select a month based on a list. He should be able to choose the year from 2026 until 2036 and the month from the list of months\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nIn the main menu, when we click on the Accounts or Entries the submenu appears, no problem. However, it should collapse when the user clicks elsewhere in the page.",
+  "instructions": "## Assistant's notes (may be inaccurate)\n\nUse these only for choices the user confirmed in the conversation that are missing from their request below. Never add a feature, database, framework, tool or deployment step that is not in the user's request; where these notes disagree with it, the user's request wins.\n\nUpdate the existing web app dashboard incrementally. Add four sections: (1) Where am I now: today's net worth across accounts with change since last month and sparkline; today's balance and six-month trend per account instead of the account-picker dropdown; month-to-date income received versus expected and spending versus planned as progress bars, plus left to spend = expected income \u2212 committed fixed costs \u2212 spending to date. (2) What needs attention: count and link to this month's entries missing actual amounts using the existing needsActual flag; a 14-day dated bill/income timeline showing amount, account, and whether that account can cover bills; the first projected below-zero or below-threshold account/group balance with month and a possible transfer suggestion; count and worst off-plan entry, including expenses over limit and income below the existing expectedMinimum. (3) Where the money goes: stacked fixed/variable/extraordinary spending and fixed-cost share of income; each category's current-month spending versus its 3\u20136-month average with percentage difference; recurring expenses annualized as amount \u00d7 12 \u00f7 interval, sorted largest first, with monthly equivalents; entries ending in the next few months and the resulting monthly cash-flow change. (4) The future: monthly projected ending-balance chart marking its lowest point while retaining the table as a detail view; monthly savings-rate trend calculated as (income \u2212 expenses) \u00f7 income; large one-off or yearly expenses due within 12 months with monthly set-aside amounts; emergency cover = current balance \u00f7 average monthly fixed expenses. Use the existing app's financial calculations and data where available.\n\n## The user's original request, verbatim\n\nThis is the authority. Where the summary above is shorter or differs, this text wins.\n\nI would like to create an app to manage my personal finance. I would like to be able to add my revenues, my fix, variable, and extraordinary expenses. Then, the app should be able to calculate my monthly cashflow indicating how much money I will have in my account in the end of the current and following months. \n\nThe app should allow me to have multiple accounts entered in parallel. Consequently, I would like to able to check the cashflow in each account separately and in a set of accounts as well (as if they were a single account). Note, I would like to be able to decide which accounts to consolidate into a single view. \n\nI should be able to classify each revenue and expense by its category. \n\nThe app should be visually pleasant and easy to use. \n\nI would also like to have a dashboard showing to me the most relevant information from my spendings on the current month, the ones to follow, and my averge spending.\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nI would like to update the app.\n\n- Categories should not be mandatory. \n- I should be able to transfer money from one account to another one.\n- In the dashboard, you can remove the main \"Feel at home...\" card. \n- In the dashboard, the \"Following months\u2019 spending\" should actually be removed\n- In the dashboard, there should be a widget with two pie charts showing the categories of the revenues and the expenses.\n- The table in the dashboard should be colored based if I ended the month with positive or negative total in that month, and in general. \n- The user should be able to select which table to show in the dashboard, giving the options: individual accounts, groups, total\n- Rename the app to \"Pockindle\"\n- Currency code should come from a list including EUR, BRL, USD\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nA few more updates:\n- Transfers should also have the options to be repeated.\n- When choosing the category for expenses/revenue, the user should be able to include new categories from that page directly.\n- Revenue and expenses should have different categories. \n- The menu should be updated. There should be: Overview; Accounts -> (Individual Accounts/ Groups); Entries -> (All entries, Revenue, Expenses, Transfers, Categories)\n- In the dashboard, we should have the cards (in this order) -> This month revenue, This month expenses, This month total, Average monthly revenue, average monthly expenses, average monthly total\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nRefactor the app to replace \"Revenue\" by \"Income\".\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nPlease update:\n- \"Repeat every x months\" should be mandatory for fixed and variable expenses. 0 should not be accepted.\n- For variable expenses, one should enter the expected value for that expense and a value that is \"ok\" to deviate from. expected value +- deviation.\n- Expenses should be visualized monthly, The fixed on top, then variable, then extraordinary. Every month, the fixed and variable expenses should be brought to the new month if they will be considered that month. The variable ones should be colored in yellow to showcase the user that he should manually update it to the correct value (instead of showing the expected one). \n- Income should also come as fixed, variable and extraordinary.\n- Similar to expenses, income should also be shown by month and the expected should also be able to be changed as well.\n\n\n\nFor both the income and expenses I would like to be able to have a monthly view on the entries. Fo\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\n- Expense type should be entered before the amount. With that, if chosen variable, the amount should be named \"This months amount\" and should be optional. \n- The same as the expenses also counts for the income. The user should be able to first select the type of income, then enter the average and deviation value, and if he wants, the value for the current month.\n- There should be no check when updating the monthly value to guarantee if the income or expense on that month is outside the range stipulated.\n- In the overview page, there should be a list with all times one expense was above the stipulated monthly value (average + variation).\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nThe income and expenses monthly table view, instead of a string, the user should be able to select a month based on a list. He should be able to choose the year from 2026 until 2036 and the month from the list of months\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nIn the main menu, when we click on the Accounts or Entries the submenu appears, no problem. However, it should collapse when the user clicks elsewhere in the page.\n\n## Subsequent user request, verbatim\n\nThis later request takes precedence where it changes earlier requirements.\n\nI would like to update the dashboard withe the following:\n\n1. Where am I now\nCurrent balance (net worth). Total balance today across accounts, with the change since last month and a small trend line. Today the dashboard only shows future months, so the actual balance never appears.\nAccount balances. One line per account with today's balance and a 6-month trend line. It replaces the \"pick an account\" dropdown for a quick read.\nThis month so far. Income received vs expected, and expenses so far vs planned, as two progress bars. The key number is \"Left to spend this month\": expected income minus committed fixed costs minus what's already spent.\n2. What needs attention\nMissing amounts. Variable expenses and incomes for this month that still have no amount entered (needsActual in monthly.py already flags them). For example: \"4 entries need this month's amount \u2192\". This keeps the data accurate, which every other widget depends on.\nComing up in the next 14 days. A short timeline of bills and income, with date, amount and account. It shows whether the right account will have money when a bill is due.\nLow-balance warning. The first month an account (or group) is projected to drop below zero or below a threshold, e.g. \"Checking goes to \u2212120 EUR in March 2027\". It can suggest a transfer, since you already support transfers. The cashflow table has this information, but users have to dig for it.\nOff-plan entries. A compact version of the overages table: a count plus the worst case. It should also flag income below its expected minimum (expectedMinimum is already computed), not just expenses above the limit.\n3. Where the money goes\nFixed vs variable vs extraordinary. A stacked bar plus the share of income already taken by fixed costs, e.g. \"62% of your income is committed before the month starts.\" This is one of the best single measures of how much room a user has.\nCategory vs usual. Each category this month against its average over the last 3\u20136 months, with the difference (\"Groceries +18%\"). It shows changes better than pies, which only show proportions.\nRecurring costs per year. Every recurring expense converted to a yearly cost (amount \u00d7 12 \u00f7 interval), sorted from largest. A line like \"Subscriptions: 1,840 EUR/year\" makes recurring costs visible, and spreading yearly bills into a monthly figure helps too.\nEnding soon. Entries whose end date falls in the next few months, such as a loan paid off or a contract ending, e.g. \"From May you'll have +250 EUR/month free.\"\n4. The future\nBalance forecast chart. A line chart of the projected end balance per month, with the lowest point marked (\"Lowest: 340 EUR in Aug 2027\"). It's much faster to read than the table. Keep the table as a detail view.\nSavings rate trend. (Income \u2212 expenses) \u00f7 income per month, as a line, with a target line if you add goals later.\nBig upcoming expenses. Large one-off or yearly expenses in the next 12 months, with how much to set aside each month to cover them.\nEmergency cover. Current balance \u00f7 average monthly fixed expenses, e.g. \"You could cover 4.2 months of fixed costs.\"",
   "history": [
     {
       "instructions": "I would like to create an app to manage my personal finance. I would like to be able to add my revenues, my fix, variable, and extraordinary expenses. Then, the app should be able to calculate my monthly cashflow indicating how much money I will have in my account in the end of the current and follo",
@@ -164,18 +164,32 @@
         "frontend/src/pages/EntityList.jsx"
       ],
       "run_id": "b2c8d9ca288b4c279113e553b32754dc"
+    },
+    {
+      "instructions": "I would like to update the dashboard withe the following:\n\n1. Where am I now\nCurrent balance (net worth). Total balance today across accounts, with the change since last month and a small trend line. Today the dashboard only shows future months, so the actual balance never appears.\nAccount balances.",
+      "saved_at": "2026-11-26T14:33:14+00:00",
+      "mode": "modify",
+      "files_touched": [
+        "backend/cashflow.py",
+        "backend/main_api.py",
+        "backend/monthly.py",
+        "backend/routers/revenue.py",
+        "frontend/src/pages/Dashboard.jsx",
+        "frontend/src/style.css"
+      ],
+      "run_id": "a01d1c69ac794d128b17068257a9c91f"
     }
   ],
   "model": {
     "primary_kind": "class",
     "name": "Class_Diagram_2",
     "classes": [
-      "Entry",
       "Account",
-      "Expense",
       "AccountGroup",
+      "Category",
       "Revenue",
-      "Category"
+      "Entry",
+      "Expense"
     ],
     "enumerations": [
       "ExpenseType"
@@ -323,10 +337,10 @@
     "description": "Personal finance web app",
     "has_user_interface": true
   },
-  "turns": 31,
-  "tool_calls_count": 62,
+  "turns": 48,
+  "tool_calls_count": 78,
   "compactions": 0,
-  "elapsed_seconds": 192.4,
+  "elapsed_seconds": 328.6,
   "max_cost_usd": 5.0,
   "max_runtime_seconds": 2400,
   "adaptive_budget_applied": true,
@@ -334,23 +348,7 @@
   "tasks": [
     {
       "id": 1,
-      "text": "Add distinct income and expense category types to Category and filter category listing/creation accordingly, while keeping category optional on Entry (R11\u2013R12, R1).",
-      "done": true,
-      "attempts": 0,
-      "blocked": false,
-      "verification": "unverified",
-      "implementation_evidence": [
-        {
-          "path": "frontend/src/entities.js",
-          "quote": "{ name: 'kind', label: 'For entries', type: 'enum', options: ['income', 'expense'], required: true }",
-          "sha256": "05407dcfacea8da8ae56f9797d2efbe84e2a343f34de7d347c641ab3951211d7",
-          "origin": "existing"
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "text": "Extend Income in backend/sql_alchemy.py and backend/pydantic_classes.py with fixed, variable, and extraordinary type, expected/average amount, deviation, optional current-month amount, and repeat interval to support monthly income views (R21\u2013R22, R25).",
+      "text": "Extend `backend/sql_alchemy.py` and its API schemas to persist the requested variable-income average and deviation, and extend monthly projections to use them; the `Revenue` model currently has no `Income` type or expected-minimum fields required by R24/R29/R41.",
       "done": true,
       "attempts": 0,
       "blocked": false,
@@ -358,7 +356,23 @@
       "implementation_evidence": [
         {
           "path": "backend/sql_alchemy.py",
-          "quote": "incomeType: Mapped_[str] = mapped_column(String_(20), default='EXTRAORDINARY', nullable=False)\n    expectedValue: Mapped_[Optional_[float]] = mapped_column(Float_, nullable=True)\n    allowedDeviation: Mapped_[Optional_[float]] = mapped_column(Float_, nullable=True)",
+          "quote": "class Income(Entry):",
+          "sha256": "99a1f22da0097284f839d2ecd47c3f4192f6dae6fb85a22d57a1694c84e094c6",
+          "origin": "existing"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "text": "Add optional category relationships and separate income versus expense category kinds in `backend/sql_alchemy.py`, `backend/pydantic_classes.py`, and category/entry routers; user explicitly says \u201cCategories should not be mandatory\u201d and \u201cRevenue and expenses should have different categories.\u201d",
+      "done": true,
+      "attempts": 0,
+      "blocked": false,
+      "verification": "unverified",
+      "implementation_evidence": [
+        {
+          "path": "backend/sql_alchemy.py",
+          "quote": "category_id: Mapped_[Optional_[int]] = mapped_column(ForeignKey_(\"category.id\"), nullable=True)",
           "sha256": "99a1f22da0097284f839d2ecd47c3f4192f6dae6fb85a22d57a1694c84e094c6",
           "origin": "existing"
         }
@@ -366,177 +380,193 @@
     },
     {
       "id": 3,
-      "text": "Make the variable Expense current-month amount optional and label its form field \u201cThis months amount,\u201d with expense type selected before amount (R23\u2013R24).",
+      "text": "Add selectable EUR, BRL, and USD currency validation/options for the `Account.currency` model element in `backend/pydantic_classes.py` and the account form in `frontend/src/entities.js`; R13.",
       "done": true,
       "attempts": 0,
       "blocked": false,
       "verification": "unverified",
       "implementation_evidence": [
         {
-          "path": "frontend/src/entities.js",
-          "quote": "{ name: 'expenseType', label: 'Expense type', type: 'enum', options: ['FIX', 'VARIABLE', 'EXTRAORDINARY'], required: true }",
-          "sha256": "05407dcfacea8da8ae56f9797d2efbe84e2a343f34de7d347c641ab3951211d7",
+          "path": "backend/pydantic_classes.py",
+          "quote": "currency: Literal['EUR', 'BRL', 'USD']",
+          "sha256": "1d520730791662cd8ee1bb46760ad2fd6fdeddb800bbda72c28142112d03c2fe",
           "origin": "existing"
         }
       ]
     },
     {
       "id": 4,
-      "text": "Enforce a positive repeat interval for fixed and variable expenses while allowing monthly updates outside the expected-value range (R16, R26).",
+      "text": "Add dashboard table selection for individual accounts, groups, or total, with sign-based coloring including overall total, using `Account`/`AccountGroup` cashflow data; R10\u2013R11.",
       "done": true,
       "attempts": 0,
-      "blocked": false,
-      "verification": "unverified",
-      "implementation_evidence": [
-        {
-          "path": "frontend/src/entities.js",
-          "quote": "{ name: 'recurrenceIntervalMonths', label: 'Repeat every (months)', type: 'number', step: '1', min: '1' }",
-          "sha256": "05407dcfacea8da8ae56f9797d2efbe84e2a343f34de7d347c641ab3951211d7",
-          "origin": "existing"
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "text": "Implement monthly income and expense views with selectable month and years 2026\u20132036, ordered fixed/variable/extraordinary for expenses, carry forward qualifying fixed/variable occurrences, and highlight variable rows yellow (R18\u2013R20, R22, R28).",
-      "done": true,
-      "attempts": 1,
-      "blocked": false,
-      "verification": "unverified",
-      "implementation_evidence": [
-        {
-          "path": "frontend/src/pages/EntityList.jsx",
-          "quote": "{Array.from({ length: 11 }, (_, index) => <option key={2026 + index} value={2026 + index}>{2026 + index}</option>)}",
-          "sha256": "fd97a42844882cb4d20118733c1c3ee569dc4efab3ae7d91fcdff5b7d71a2a45",
-          "origin": "existing"
-        }
-      ]
-    },
-    {
-      "id": 6,
-      "text": "Add expense overage occurrence data and show every expense occurrence above average plus deviation on Overview (R27).",
-      "done": true,
-      "attempts": 0,
-      "blocked": false,
-      "verification": "unverified",
-      "implementation_evidence": [
-        {
-          "path": "frontend/src/App.jsx",
-          "quote": "<Route path=\"/\" element={<Dashboard />}/>",
-          "sha256": "78cd8dc406e3275543f79e1a0a9c04dcfd00888e456e8e53d3ae66e674747d85",
-          "origin": "written"
-        }
-      ]
-    },
-    {
-      "id": 7,
-      "text": "Update frontend/src/pages/Dashboard.jsx to remove the \u201cFeel at home...\u201d and \u201cFollowing months\u2019 spending\u201d cards, add income/expense category pie charts, and order the six requested income/expense/total cards (R3\u2013R5, R14).",
-      "done": true,
-      "attempts": 0,
-      "blocked": false,
-      "verification": "unverified",
-      "implementation_evidence": [
-        {
-          "path": "frontend/src/App.jsx",
-          "quote": "import Dashboard from './pages/Dashboard.jsx'",
-          "sha256": "78cd8dc406e3275543f79e1a0a9c04dcfd00888e456e8e53d3ae66e674747d85",
-          "origin": "written"
-        }
-      ]
-    },
-    {
-      "id": 8,
-      "text": "Add dashboard table selection for individual accounts, groups, or total and color monthly and overall totals by positive/negative cashflow (R6\u2013R7).",
-      "done": true,
-      "attempts": 1,
       "blocked": false,
       "verification": "unverified",
       "implementation_evidence": [
         {
           "path": "frontend/src/pages/Dashboard.jsx",
           "quote": "<option value=\"account\">Individual accounts</option><option value=\"group\">Groups</option><option value=\"total\">Total</option>",
-          "sha256": "b9e6a32fb711d7990d7b9b87233bd58860930a6ce8145825f88e496172d2167d",
+          "sha256": "0a03db03de3954f8baea9e2a9156d5d1e9d3d18491ff3df361c6e10c697d44c7",
+          "origin": "written"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "text": "Add an Overview pie-chart widget for income categories and expense categories to `frontend/src/pages/Dashboard.jsx`, preserving the requested existing dashboard behaviors; R9.",
+      "done": true,
+      "attempts": 0,
+      "blocked": false,
+      "verification": "unverified",
+      "implementation_evidence": [
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "quote": "<CategoryPie title=\"Income\" items={summary.categories.income} currency={currency}/><CategoryPie title=\"Expenses\" items={summary.categories.expense} currency={currency}/>",
+          "sha256": "0a03db03de3954f8baea9e2a9156d5d1e9d3d18491ff3df361c6e10c697d44c7",
+          "origin": "written"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "text": "Update dashboard cards and labels in `frontend/src/pages/Dashboard.jsx` to the exact order in R17, using \u201cIncome\u201d rather than \u201cRevenue\u201d throughout as R18 requires.",
+      "done": true,
+      "attempts": 0,
+      "blocked": false,
+      "verification": "unverified",
+      "implementation_evidence": [
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "quote": "['This month income', summary.months[0].income],",
+          "sha256": "0a03db03de3954f8baea9e2a9156d5d1e9d3d18491ff3df361c6e10c697d44c7",
+          "origin": "written"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "text": "Add monthly expense/income table views with fixed, variable, extraordinary ordering, year selection 2026\u20132036 and month list, and yellow variable rows to `frontend/src/pages/EntityList.jsx`; preserve monthly occurrence carry-forward from `backend/monthly.py`; R21\u2013R26.",
+      "done": true,
+      "attempts": 0,
+      "blocked": false,
+      "verification": "unverified",
+      "implementation_evidence": [
+        {
+          "path": "frontend/src/pages/EntityList.jsx",
+          "quote": "{Array.from({ length: 11 }, (_, index) => <option key={2026 + index} value={2026 + index}>{2026 + index}</option>)}",
+          "sha256": "050ad03af0e507aa9bfb5a2ed1c80b14c2dab6b4200e3a2b42f5843508d9ce39",
           "origin": "existing"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "text": "Add the requested dashboard net-worth/current account balances and six-month trends, month-to-date progress bars, and left-to-spend calculation in `frontend/src/pages/Dashboard.jsx`; R33\u2013R36.",
+      "done": true,
+      "attempts": 0,
+      "blocked": false,
+      "verification": "unverified",
+      "implementation_evidence": [
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "quote": "<h3>Where am I now</h3>",
+          "sha256": "0a03db03de3954f8baea9e2a9156d5d1e9d3d18491ff3df361c6e10c697d44c7",
+          "origin": "written"
         }
       ]
     },
     {
       "id": 9,
-      "text": "Update the app title and currency selector to \u201cPockindle\u201d and a list including EUR, BRL, and USD (R8\u2013R9).",
+      "text": "Add dashboard missing-monthly-amount count/link and next-14-days dated income/bill timeline with amount and account using `needsActual` and monthly entries; R37\u2013R38.",
       "done": true,
       "attempts": 0,
       "blocked": false,
       "verification": "unverified",
       "implementation_evidence": [
         {
-          "path": "frontend/src/entities.js",
-          "quote": "{ name: 'currency', label: 'Currency code', type: 'enum', options: ['EUR', 'BRL', 'USD'], required: true }",
-          "sha256": "05407dcfacea8da8ae56f9797d2efbe84e2a343f34de7d347c641ab3951211d7",
-          "origin": "existing"
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "quote": "<h4>Coming up in the next 14 days</h4>",
+          "sha256": "0a03db03de3954f8baea9e2a9156d5d1e9d3d18491ff3df361c6e10c697d44c7",
+          "origin": "written"
         }
       ]
     },
     {
       "id": 10,
-      "text": "Implement repeatable transfers in the existing transfer handler and transfer UI (R2, R10).",
+      "text": "Add a dashboard low-balance forecast warning for first below-zero/threshold account or group and a transfer suggestion using existing cashflow and transfer support; R39\u2013R40.",
       "done": true,
       "attempts": 0,
       "blocked": false,
       "verification": "unverified",
       "implementation_evidence": [
         {
-          "path": "backend/sql_alchemy.py",
-          "quote": "class Transfer(Base):\n    __tablename__ = \"transfer\"",
-          "sha256": "99a1f22da0097284f839d2ecd47c3f4192f6dae6fb85a22d57a1694c84e094c6",
-          "origin": "existing"
+          "path": "backend/main_api.py",
+          "quote": "summary['lowBalance'] = min(alerts, key=lambda row: (row['month'], row['balance'])) if alerts else None",
+          "sha256": "b61f7fdc87c396d56d8948fe4cb0d37f99f64e3c094e7da645db3ee644167e98",
+          "origin": "written"
         }
       ]
     },
     {
       "id": 11,
-      "text": "Update the navigation in frontend/src/App.jsx to Overview; Accounts \u2192 Individual Accounts/Groups; Entries \u2192 All entries/Income/Expenses/Transfers/Categories (R13, R15).",
+      "text": "Add compact dashboard off-plan summary including expense overages and income below `expectedMinimum`, with count and worst case; R41.",
       "done": true,
       "attempts": 0,
       "blocked": false,
       "verification": "unverified",
       "implementation_evidence": [
         {
-          "path": "frontend/src/App.jsx",
-          "quote": "<details className=\"nav-menu\"><summary>Accounts \u25be</summary>",
-          "sha256": "78cd8dc406e3275543f79e1a0a9c04dcfd00888e456e8e53d3ae66e674747d85",
+          "path": "backend/main_api.py",
+          "quote": "summary['offPlan'] = {'count': len(off_plan), 'worst': max(off_plan, key=lambda row: row['difference']) if off_plan else None}",
+          "sha256": "b61f7fdc87c396d56d8948fe4cb0d37f99f64e3c094e7da645db3ee644167e98",
           "origin": "written"
         }
       ]
     },
     {
       "id": 12,
-      "text": "Add category creation directly from the income/expense category selection form and retain optional category selection (R11, R1).",
-      "done": true,
-      "attempts": 1,
-      "blocked": false,
-      "verification": "unverified",
-      "implementation_evidence": [
-        {
-          "path": "frontend/src/pages/EntityList.jsx",
-          "quote": "const result = await save('category', { name: newCategory.trim(), kind: categoryKind })",
-          "sha256": "fd97a42844882cb4d20118733c1c3ee569dc4efab3ae7d91fcdff5b7d71a2a45",
-          "origin": "existing"
-        }
-      ]
-    },
-    {
-      "id": 13,
-      "text": "Close the Accounts or Entries submenu on outside-page clicks while preserving click-to-open behavior (R29).",
+      "text": "Add dashboard stacked expense-type bar, fixed-cost share, category-versus-3\u20136-month-average comparison, annualized recurring-expense ranking, and ending-soon cashflow changes; R42\u2013R45.",
       "done": true,
       "attempts": 0,
       "blocked": false,
       "verification": "unverified",
       "implementation_evidence": [
         {
-          "path": "frontend/src/App.jsx",
-          "quote": "document.addEventListener('pointerdown', closeOnOutsideClick)\n    return () => document.removeEventListener('pointerdown', closeOnOutsideClick)",
-          "sha256": "78cd8dc406e3275543f79e1a0a9c04dcfd00888e456e8e53d3ae66e674747d85",
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "quote": "<h3>Where the money goes</h3>",
+          "sha256": "0a03db03de3954f8baea9e2a9156d5d1e9d3d18491ff3df361c6e10c697d44c7",
           "origin": "written"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "text": "Add dashboard projected-ending-balance chart with lowest point while retaining the table, savings-rate trend, upcoming large one-off/yearly expenses with monthly set-aside, and emergency-cover metric; R46\u2013R49.",
+      "done": true,
+      "attempts": 0,
+      "blocked": false,
+      "verification": "unverified",
+      "implementation_evidence": [
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "quote": "<h3>The future</h3>",
+          "sha256": "0a03db03de3954f8baea9e2a9156d5d1e9d3d18491ff3df361c6e10c697d44c7",
+          "origin": "written"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "text": "Add inline category creation from income/expense category selection and keep category choices separated by kind, using `frontend/src/pages/EntityList.jsx` and the category API; R14\u2013R15.",
+      "done": true,
+      "attempts": 0,
+      "blocked": false,
+      "verification": "unverified",
+      "implementation_evidence": [
+        {
+          "path": "frontend/src/pages/EntityList.jsx",
+          "quote": "const result = await save('category', { name: newCategory.trim(), kind: categoryKind })",
+          "sha256": "050ad03af0e507aa9bfb5a2ed1c80b14c2dab6b4200e3a2b42f5843508d9ce39",
+          "origin": "existing"
         }
       ]
     }
@@ -544,43 +574,155 @@
   "requirements": [
     {
       "id": 1,
-      "text": "Categories should not be mandatory for income and expenses.",
-      "kind": "validation",
+      "text": "Users can add income and fixed, variable, and extraordinary expenses.",
+      "kind": "action",
       "status": "implemented",
       "evidence": [
         {
+          "path": "backend/routers/revenue.py",
+          "line": "async def create_income(income_data: IncomeCreate, database: Session = Depends(get_db)) -> Income:"
+        },
+        {
+          "path": "backend/routers/expense.py",
+          "line": "async def create_expense(expense_data: ExpenseCreate, database: Session = Depends(get_db)) -> Expense:"
+        },
+        {
           "path": "backend/pydantic_classes.py",
-          "line": "category: Optional[int] = None  # Categories are optional for entries."
+          "line": "class ExpenseCreate(EntryCreate):"
         }
       ],
-      "note": "",
+      "note": "Reachable creation operations accept and persist income and expenses. ExpenseCreate requires an expense type; the type model includes fixed, variable, and extraordinary values.",
+      "inspection_paths": [],
+      "verification": "verified",
+      "verification_note": "Cited in the source; API: a passing workflow called POST /expense/, the cited route"
+    },
+    {
+      "id": 2,
+      "text": "The app calculates monthly cashflow for the current and following months, indicating the money expected to remain in the account at each month end.",
+      "kind": "computed",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/cashflow.py",
+          "line": "def project("
+        },
+        {
+          "path": "backend/cashflow.py",
+          "line": "\"endBalance\": float(balance),"
+        }
+      ],
+      "note": "The project function produces monthly end balances from scheduled entries, balances and transfers; its default projection spans 12 months.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; API: a workflow passed but called no cited route"
     },
     {
-      "id": 2,
-      "text": "Users should be able to transfer money from one account to another.",
+      "id": 3,
+      "text": "Users can manage multiple accounts in parallel and view cashflow for an individual account.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/routers/account.py",
+          "line": "@router.get('/account/{account_id}/cashflow/', tags=['Account'])"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"card\"><h4>Account balances today</h4>{summary.accounts.map(account => <div className=\"account-trend\" key={account.id}><Link to={`/account/${account.id}/edit`}>{account.name}</Link><strong>{money(account.todayBalance, currency)}</strong><Trend values={account.balanceTrend} label={`${account.name} six-month balance trend`} /></div>)}</div>"
+        }
+      ],
+      "note": "Accounts are stored independently, individual account cashflow is exposed, and the dashboard shows account-level balances and projections.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called POST /account/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 4,
+      "text": "Users can choose which accounts to consolidate into a combined cashflow view.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<label className=\"field dashboard-selector\"><span>Show cashflow table</span><select value={view} onChange={event => setView(event.target.value)}><option value=\"account\">Individual accounts</option><option value=\"group\">Groups</option><option value=\"total\">Total</option></select></label>"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "{view === 'total' ? <CashflowTable title={`All accounts \u00b7 ${currency}`} months={summary.months}/> : view === 'account' ? summary.accounts.map(account => <CashflowTable key={account.id} title={account.name} months={account.months}/>) : summary.groups.length ? summary.groups.map(group => <CashflowTable key={group.id} title={group.name} months={group.months}/>) : <div className=\"card empty\">No groups in {currency} yet. <Link to=\"/accountgroup/new\">Create a group \u2192</Link></div>"
+        }
+      ],
+      "note": "Dashboard selector offers individual account, group, or total views; account groups configure which accounts are consolidated. The group-view expression renders each group cashflow.",
+      "inspection_paths": [],
+      "verification": "unverified",
+      "verification_note": "Found in the source; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 5,
+      "text": "Users can classify income and expenses using optional categories.",
+      "kind": "rule",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/pydantic_classes.py",
+          "line": "category: Optional[int] = None  # Categories are optional for entries."
+        },
+        {
+          "path": "backend/routers/revenue.py",
+          "line": "if related_category.kind != 'income':"
+        }
+      ],
+      "note": "The category field is optional. When supplied, the income endpoint enforces that it refers to an income category; the expense endpoint similarly checks expense kind.",
+      "inspection_paths": [],
+      "verification": "verified",
+      "verification_note": "Cited in the source; API: a passing workflow called POST /income/, the cited route"
+    },
+    {
+      "id": 6,
+      "text": "Users can transfer money between accounts.",
       "kind": "action",
       "status": "implemented",
       "evidence": [
         {
           "path": "backend/main_api.py",
-          "line": "@app.post('/transfer/', tags=['Transfer'])"
+          "line": "def create_transfer(transfer: TransferCreate, database: Session = Depends(get_db)):"
         },
         {
           "path": "backend/main_api.py",
-          "line": "record = Transfer(fromAccount_id=source.id, toAccount_id=destination.id, amount=transfer.amount, date=transfer.date, description=transfer.description,"
+          "line": "record = Transfer(fromAccount_id=source.id, toAccount_id=destination.id,"
+        },
+        {
+          "path": "backend/main_api.py",
+          "line": "database.add(record)"
         }
       ],
-      "note": "",
+      "note": "The transfer creation operation checks that both accounts exist and share currency, then persists the transfer between source and destination accounts.",
       "inspection_paths": [],
       "verification": "verified",
       "verification_note": "Cited in the source; API: a passing workflow called POST /transfer/, the cited route"
     },
     {
-      "id": 3,
-      "text": "Remove the main \u201cFeel at home...\u201d card from the dashboard.",
+      "id": 7,
+      "text": "Transfers can be configured to repeat.",
+      "kind": "action",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/pydantic_classes.py",
+          "line": "recurrenceIntervalMonths: Optional[int] = None"
+        },
+        {
+          "path": "backend/main_api.py",
+          "line": "recurrenceIntervalMonths=transfer.recurrenceIntervalMonths, endDate=transfer.endDate)"
+        }
+      ],
+      "note": "Transfer creation accepts and stores an optional repeat interval and end date; cashflow projection generates its repeated occurrences.",
+      "inspection_paths": [],
+      "verification": "verified",
+      "verification_note": "Cited in the source; API: a passing workflow called POST /transfer/, the cited route"
+    },
+    {
+      "id": 8,
+      "text": "The dashboard does not show the \u201cFeel at home...\u201d card or the \u201cFollowing months\u2019 spending\u201d section.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
@@ -589,14 +731,14 @@
           "line": "<div className=\"page-heading\"><div><p className=\"eyebrow\">OVERVIEW</p><h2>Your spending outlook</h2></div></div>"
         }
       ],
-      "note": "Dashboard renders the overview heading and content without the \u201cFeel at home...\u201d card.",
+      "note": "The shown dashboard has neither the named 'Feel at home...' card nor a 'Following months\u2019 spending' section.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 4,
-      "text": "Remove \u201cFollowing months\u2019 spending\u201d from the dashboard.",
+      "id": 9,
+      "text": "The dashboard includes two pie charts, one showing income categories and one showing expense categories.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
@@ -605,30 +747,14 @@
           "line": "<div className=\"card\"><h3>Categories \u00b7 this month</h3><div className=\"pie-grid\"><CategoryPie title=\"Income\" items={summary.categories.income} currency={currency}/><CategoryPie title=\"Expenses\" items={summary.categories.expense} currency={currency}/></div></div>"
         }
       ],
-      "note": "The dashboard contains no \u201cFollowing months\u2019 spending\u201d section; it instead proceeds from this-month category charts to the table selector.",
+      "note": "The dashboard renders two category pie charts, one for income and one for expenses.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 5,
-      "text": "The dashboard should include a widget with two pie charts showing income categories and expense categories.",
-      "kind": "ui",
-      "status": "implemented",
-      "evidence": [
-        {
-          "path": "frontend/src/pages/Dashboard.jsx",
-          "line": "<div className=\"card\"><h3>Categories \u00b7 this month</h3><div className=\"pie-grid\"><CategoryPie title=\"Income\" items={summary.categories.income} currency={currency}/><CategoryPie title=\"Expenses\" items={summary.categories.expense} currency={currency}/></div></div>"
-        }
-      ],
-      "note": "The widget provides separate Income and Expenses pie charts using the respective category summaries.",
-      "inspection_paths": [],
-      "verification": "unverified",
-      "verification_note": "Found in the source; screens: not run (the frontend builds)"
-    },
-    {
-      "id": 6,
-      "text": "Color the dashboard table based on whether the month\u2019s total and the overall total are positive or negative.",
+      "id": 10,
+      "text": "Dashboard table coloring reflects whether the month\u2019s total is positive or negative, including the overall total.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
@@ -637,14 +763,14 @@
           "line": "return <tr key={row.month}><td>{row.month}</td><td>{row.income.toFixed(2)}</td><td>{row.spending.toFixed(2)}</td><td className={monthly >= 0 ? 'balance-positive' : 'balance-negative'}>{monthly.toFixed(2)}</td><td className={row.endBalance >= 0 ? 'balance-positive' : 'balance-negative'}><strong>{row.endBalance.toFixed(2)}</strong></td></tr>"
         }
       ],
-      "note": "Monthly total and general end balance each receive positive/negative color classes based on their sign.",
+      "note": "Both monthly net total and the overall end balance receive positive/negative classes based on their respective sign.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 7,
-      "text": "Let users choose which table to show on the dashboard: individual accounts, groups, or total.",
+      "id": 11,
+      "text": "Users can choose whether the dashboard table shows individual accounts, groups, or the total.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
@@ -653,30 +779,34 @@
           "line": "<label className=\"field dashboard-selector\"><span>Show cashflow table</span><select value={view} onChange={event => setView(event.target.value)}><option value=\"account\">Individual accounts</option><option value=\"group\">Groups</option><option value=\"total\">Total</option></select></label>"
         }
       ],
-      "note": "Users can select individual-account, group, or total table views.",
+      "note": "Dashboard table view selection offers the three requested choices.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 8,
-      "text": "Name the app \u201cPockindle.\u201d",
+      "id": 12,
+      "text": "The app is named \u201cPockindle\u201d.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
         {
+          "path": "backend/main_api.py",
+          "line": "title='Pockindle API',"
+        },
+        {
           "path": "frontend/src/App.jsx",
-          "line": "<BrowserRouter><div className=\"app-shell\"><header className=\"site-header\"><div className=\"header-inner\"><Link className=\"brand\" to=\"/\"><span className=\"brand-mark\">\u25c8</span> Pockindle<span className=\"brand-dot\">.</span></Link><nav ref={navigationRef} aria-label=\"Main navigation\"><NavLink to=\"/\" end>Overview</NavLink><details className=\"nav-menu\"><summary>Accounts \u25be</summary><div className=\"nav-dropdown\"><NavLink to=\"/account\">Individual Accounts</NavLink><NavLink to=\"/accountgroup\">Groups</NavLink></div></details><details className=\"nav-menu\"><summary>Entries \u25be</summary><div className=\"nav-dropdown\"><NavLink to=\"/entry\">All entries</NavLink><NavLink to=\"/income\">Income</NavLink><NavLink to=\"/expense\">Expenses</NavLink><NavLink to=\"/transfer\">Transfers</NavLink><NavLink to=\"/category\">Categories</NavLink></div></details></nav></div></header>"
+          "line": "return <BrowserRouter><div className=\"app-shell\"><header className=\"site-header\"><div className=\"header-inner\"><Link className=\"brand\" to=\"/\"><span className=\"brand-mark\">\u25c8</span> Pockindle<span className=\"brand-dot\">.</span></Link>"
         }
       ],
-      "note": "",
+      "note": "Pockindle is the displayed app brand; the API title includes the same name.",
       "inspection_paths": [],
-      "verification": "unverified",
-      "verification_note": "Found in the source; screens: not run (the frontend builds)"
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, a route of the cited file; screens: not run (the frontend builds)"
     },
     {
-      "id": 9,
-      "text": "Provide a currency-code list that includes EUR, BRL, and USD.",
+      "id": 13,
+      "text": "Currency code is selected from a list that includes EUR, BRL, and USD.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
@@ -685,35 +815,15 @@
           "line": "{ name: 'currency', label: 'Currency code', type: 'enum', options: ['EUR', 'BRL', 'USD'], required: true },"
         }
       ],
-      "note": "",
+      "note": "The account form uses a currency enum selector offering EUR, BRL, and USD.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 10,
-      "text": "Transfers should be repeatable.",
+      "id": 14,
+      "text": "Users can add new income or expense categories directly from the category-selection page.",
       "kind": "action",
-      "status": "implemented",
-      "evidence": [
-        {
-          "path": "backend/cashflow.py",
-          "line": "\"\"\"Project a transfer on its date and, optionally, every interval months.\"\"\""
-        },
-        {
-          "path": "backend/main_api.py",
-          "line": "recurrenceIntervalMonths=transfer.recurrenceIntervalMonths, endDate=transfer.endDate)"
-        }
-      ],
-      "note": "",
-      "inspection_paths": [],
-      "verification": "verified",
-      "verification_note": "Cited in the source; API: a passing workflow called POST /transfer/, the cited route"
-    },
-    {
-      "id": 11,
-      "text": "Allow users to add a new category directly from the page where they choose an income or expense category.",
-      "kind": "ui",
       "status": "implemented",
       "evidence": [
         {
@@ -722,11 +832,7 @@
         },
         {
           "path": "frontend/src/pages/EntityList.jsx",
-          "line": "const result = await save('category', { name: newCategory.trim(), kind: categoryKind })"
-        },
-        {
-          "path": "frontend/src/pages/EntityList.jsx",
-          "line": "{field.name === 'category' && (entity === 'income' || entity === 'expense') && <span className=\"inline-category\"><input aria-label={`New ${entity} category name`} placeholder={`New ${entity} category`} value={newCategory} onChange={event => setNewCategory(event.target.value)} /><button type=\"button\" className=\"button\" disabled={addingCategory || !newCategory.trim()} onClick={createCategory}>{addingCategory ? 'Adding\u2026' : 'Add category'}</button></span>}</label>)"
+          "line": "<button type=\"button\" className=\"button\" disabled={addingCategory || !newCategory.trim()} onClick={createCategory}>{addingCategory ? 'Adding\u2026' : 'Add category'}</button>"
         }
       ],
       "note": "",
@@ -735,48 +841,48 @@
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 12,
-      "text": "Income and expenses should have separate categories.",
+      "id": 15,
+      "text": "Income categories and expense categories are separate.",
       "kind": "rule",
       "status": "implemented",
       "evidence": [
         {
-          "path": "backend/routers/revenue.py",
-          "line": "if related_category.kind != 'income':"
+          "path": "backend/sql_alchemy.py",
+          "line": "kind: Mapped_[str] = mapped_column(String_(10), nullable=False)"
         },
         {
           "path": "backend/routers/expense.py",
           "line": "if related_category.kind != 'expense':"
-        },
-        {
-          "path": "backend/sql_alchemy.py",
-          "line": "kind: Mapped_[str] = mapped_column(String_(10), nullable=False)"
         }
       ],
-      "note": "",
+      "note": "Categories carry an income/expense kind and the income and expense create/update routes validate the matching kind.",
       "inspection_paths": [],
       "verification": "verified",
       "verification_note": "Cited in the source; API: a passing workflow called POST /expense/, the cited route"
     },
     {
-      "id": 13,
-      "text": "The menu should include Overview; Accounts with Individual Accounts and Groups; and Entries with All entries, Income, Expenses, Transfers, and Categories.",
+      "id": 16,
+      "text": "The menu contains Overview; Accounts with Individual Accounts and Groups; and Entries with All entries, Income, Expenses, Transfers, and Categories.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
         {
           "path": "frontend/src/App.jsx",
-          "line": "<BrowserRouter><div className=\"app-shell\"><header className=\"site-header\"><div className=\"header-inner\"><Link className=\"brand\" to=\"/\"><span className=\"brand-mark\">\u25c8</span> Pockindle<span className=\"brand-dot\">.</span></Link><nav ref={navigationRef} aria-label=\"Main navigation\"><NavLink to=\"/\" end>Overview</NavLink><details className=\"nav-menu\"><summary>Accounts \u25be</summary><div className=\"nav-dropdown\"><NavLink to=\"/account\">Individual Accounts</NavLink><NavLink to=\"/accountgroup\">Groups</NavLink></div></details><details className=\"nav-menu\"><summary>Entries \u25be</summary><div className=\"nav-dropdown\"><NavLink to=\"/entry\">All entries</NavLink><NavLink to=\"/income\">Income</NavLink><NavLink to=\"/expense\">Expenses</NavLink><NavLink to=\"/transfer\">Transfers</NavLink><NavLink to=\"/category\">Categories</NavLink></div></details></nav></div></header>"
+          "line": "<Routes><Route path=\"/\" element={<Dashboard />}/><Route path=\"/transfer\" element={<Transfers />}/>{Object.keys(entities).map(key => <React.Fragment key={key}><Route path={`/${key}`} element={<EntityList entity={key}/>}/>{!entities[key].readOnlyCreate && <Route path={`/${key}/new`} element={<EntityForm entity={key}/>}/>}<Route path={`/${key}/:id/edit`} element={<EntityForm entity={key}/>}/></React.Fragment>)}<Route path=\"*\" element={<main className=\"container\"><h1>Page not found</h1><Link to=\"/\">Back to overview</Link></main>}/></Routes>"
+        },
+        {
+          "path": "frontend/src/App.jsx",
+          "line": "return <BrowserRouter><div className=\"app-shell\"><header className=\"site-header\"><div className=\"header-inner\"><Link className=\"brand\" to=\"/\"><span className=\"brand-mark\">\u25c8</span> Pockindle<span className=\"brand-dot\">.</span></Link><nav ref={navigationRef} aria-label=\"Main navigation\"><NavLink to=\"/\" end>Overview</NavLink><details className=\"nav-menu\"><summary>Accounts \u25be</summary><div className=\"nav-dropdown\"><NavLink to=\"/account\">Individual Accounts</NavLink><NavLink to=\"/accountgroup\">Groups</NavLink></div></details><details className=\"nav-menu\"><summary>Entries \u25be</summary><div className=\"nav-dropdown\"><NavLink to=\"/entry\">All entries</NavLink><NavLink to=\"/income\">Income</NavLink><NavLink to=\"/expense\">Expenses</NavLink><NavLink to=\"/transfer\">Transfers</NavLink><NavLink to=\"/category\">Categories</NavLink></div></details></nav></div></header>"
         }
       ],
-      "note": "",
+      "note": "The navigation includes Overview, both account submenu destinations, and all five requested Entries destinations.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 14,
-      "text": "Show dashboard cards in this order: This month income, This month expenses, This month total, Average monthly income, Average monthly expenses, Average monthly total.",
+      "id": 17,
+      "text": "Dashboard cards appear in this order: This month revenue, This month expenses, This month total, Average monthly revenue, average monthly expenses, average monthly total.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
@@ -805,66 +911,50 @@
           "line": "['Average monthly total', summary.months.reduce((sum, row) => sum + row.income - row.spending, 0) / summary.months.length]"
         }
       ],
-      "note": "The six cards are declared in the requested order. (Average expenses uses the backend's averageMonthlySpending metric.)",
+      "note": "The six dashboard metric cards are rendered in the requested order. Labels use the later mandated term 'Income' instead of 'Revenue'.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 15,
-      "text": "Use \u201cIncome\u201d instead of \u201cRevenue.\u201d",
+      "id": 18,
+      "text": "Replace the term \u201cRevenue\u201d with \u201cIncome\u201d throughout the app.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
         {
-          "path": "frontend/src/pages/Dashboard.jsx",
-          "line": "['This month income', summary.months[0].income],"
-        },
-        {
           "path": "frontend/src/App.jsx",
-          "line": "<BrowserRouter><div className=\"app-shell\"><header className=\"site-header\"><div className=\"header-inner\"><Link className=\"brand\" to=\"/\"><span className=\"brand-mark\">\u25c8</span> Pockindle<span className=\"brand-dot\">.</span></Link><nav ref={navigationRef} aria-label=\"Main navigation\"><NavLink to=\"/\" end>Overview</NavLink><details className=\"nav-menu\"><summary>Accounts \u25be</summary><div className=\"nav-dropdown\"><NavLink to=\"/account\">Individual Accounts</NavLink><NavLink to=\"/accountgroup\">Groups</NavLink></div></details><details className=\"nav-menu\"><summary>Entries \u25be</summary><div className=\"nav-dropdown\"><NavLink to=\"/entry\">All entries</NavLink><NavLink to=\"/income\">Income</NavLink><NavLink to=\"/expense\">Expenses</NavLink><NavLink to=\"/transfer\">Transfers</NavLink><NavLink to=\"/category\">Categories</NavLink></div></details></nav></div></header>"
+          "line": "return <BrowserRouter><div className=\"app-shell\"><header className=\"site-header\"><div className=\"header-inner\"><Link className=\"brand\" to=\"/\"><span className=\"brand-mark\">\u25c8</span> Pockindle<span className=\"brand-dot\">.</span></Link><nav ref={navigationRef} aria-label=\"Main navigation\"><NavLink to=\"/\" end>Overview</NavLink><details className=\"nav-menu\"><summary>Accounts \u25be</summary><div className=\"nav-dropdown\"><NavLink to=\"/account\">Individual Accounts</NavLink><NavLink to=\"/accountgroup\">Groups</NavLink></div></details><details className=\"nav-menu\"><summary>Entries \u25be</summary><div className=\"nav-dropdown\"><NavLink to=\"/entry\">All entries</NavLink><NavLink to=\"/income\">Income</NavLink><NavLink to=\"/expense\">Expenses</NavLink><NavLink to=\"/transfer\">Transfers</NavLink><NavLink to=\"/category\">Categories</NavLink></div></details></nav></div></header>"
         }
       ],
-      "note": "",
+      "note": "Visible app navigation labels the concept Income, not Revenue. The legacy database table name is internal storage, not a user-facing label.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 16,
-      "text": "Fixed and variable expenses must have a repeat interval in months, and the interval cannot be 0.",
+      "id": 19,
+      "text": "Fixed and variable expenses require a repeat interval in months, and the interval cannot be zero.",
       "kind": "validation",
       "status": "implemented",
       "evidence": [
-        {
-          "path": "backend/pydantic_classes.py",
-          "line": "def positive_interval(cls, value):"
-        },
-        {
-          "path": "backend/pydantic_classes.py",
-          "line": "if value is not None and value < 1:"
-        },
-        {
-          "path": "backend/pydantic_classes.py",
-          "line": "raise ValueError('Recurrence interval must be at least one month')"
-        },
         {
           "path": "backend/pydantic_classes.py",
           "line": "if self.expenseType in (ExpenseType.FIX, ExpenseType.VARIABLE) and self.recurrenceIntervalMonths is None:"
         },
         {
           "path": "backend/pydantic_classes.py",
-          "line": "raise ValueError('Fixed and variable expenses require Repeat every x months')"
+          "line": "if value is not None and value < 1:"
         }
       ],
-      "note": "Expense input validation rejects intervals below one month and requires an interval for fixed and variable types.",
+      "note": "Fixed and variable expense creation requires a repeat interval; the shared interval validator rejects zero and negative values. The frontend also marks recurring expenses' interval required and minimum 1.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; API: a workflow passed but called no cited route"
     },
     {
-      "id": 17,
-      "text": "For a variable expense, let the user enter an expected value and a permitted deviation from that value.",
+      "id": 20,
+      "text": "For variable expenses, users enter an expected value and an allowed deviation value.",
       "kind": "validation",
       "status": "implemented",
       "evidence": [
@@ -874,85 +964,73 @@
         },
         {
           "path": "backend/pydantic_classes.py",
-          "line": "raise ValueError('Variable expenses require expected value and allowed deviation')"
-        },
-        {
-          "path": "backend/pydantic_classes.py",
           "line": "if not 0 < self.expectedValue < float('inf') or not 0 <= self.allowedDeviation < float('inf'):"
         }
       ],
-      "note": "Variable expense validation requires an expected value and allowed deviation, checking both are in acceptable numeric ranges.",
+      "note": "Variable expense creation requires an expected value and nonnegative finite deviation.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; API: a workflow passed but called no cited route"
     },
     {
-      "id": 18,
-      "text": "Show expenses in a monthly view, ordered with fixed expenses first, variable expenses second, and extraordinary expenses third.",
+      "id": 21,
+      "text": "Expenses are shown in a monthly view, ordered fixed first, variable second, and extraordinary third.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
         {
-          "path": "frontend/src/pages/EntityList.jsx",
-          "line": "{monthlyEntity && <section className=\"card\"><div className=\"month-heading\"><h2>Monthly entries</h2><div className=\"month-selectors\"><label className=\"field\">Month <select value={month} onChange={event => setMonth(Number(event.target.value))}>{Array.from({ length: 12 }, (_, index) => <option key={index + 1} value={index + 1}>{new Intl.DateTimeFormat('en', { month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, index, 1)))}</option>)}</select></label><label className=\"field\">Year <select value={year} onChange={event => setYear(Number(event.target.value))}>{Array.from({ length: 11 }, (_, index) => <option key={2026 + index} value={2026 + index}>{2026 + index}</option>)}</select></label></div></div>"
-        },
-        {
           "path": "backend/monthly.py",
-          "line": "return sorted(result, key=lambda row: (order.get(row['type'], 2), row['date'], row['id']))"
+          "line": "order = {'FIX': 0, 'FIXED': 0, 'VARIABLE': 1, 'EXTRAORDINARY': 2}"
         },
         {
           "path": "frontend/src/pages/EntityList.jsx",
-          "line": "<td>{row.date}</td><td>{row.type === 'FIX' ? 'Fixed' : row.type === 'FIXED' ? 'Fixed' : row.type === 'VARIABLE' ? 'Variable' : 'Extraordinary'}</td><td>{row.description}</td>"
+          "line": "{monthlyEntity && <section className=\"card\"><div className=\"month-heading\"><h2>Monthly entries</h2>"
         }
       ],
-      "note": "",
+      "note": "Expenses are listed in the month-specific view and sorted Fixed, Variable, Extraordinary.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; API: a workflow passed but called no cited route; screens: not run (the frontend builds)"
     },
     {
-      "id": 19,
-      "text": "Bring fixed and variable expenses into a new month when they are considered for that month.",
+      "id": 22,
+      "text": "Fixed and variable expenses are carried forward to each month in which they are considered applicable.",
       "kind": "rule",
       "status": "implemented",
       "evidence": [
         {
           "path": "backend/cashflow.py",
-          "line": "for entry in entries:"
+          "line": "interval = entry.recurrenceIntervalMonths"
         },
         {
-          "path": "backend/cashflow.py",
-          "line": "interval = entry.recurrenceIntervalMonths"
+          "path": "backend/monthly.py",
+          "line": "for day in occurrences(record, first, last):"
         }
       ],
-      "note": "",
+      "note": "Occurrences are generated at each recurrence interval and stop at the end date, so fixed and variable entries appear in each applicable month.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; API: a workflow passed but called no cited route"
     },
     {
-      "id": 20,
-      "text": "Highlight variable expenses in yellow in the monthly view to indicate that the user should manually update their value rather than use the expected value.",
+      "id": 23,
+      "text": "Variable expenses in the monthly view are highlighted yellow to indicate that the user should update the amount, rather than treating the expected value as the actual amount.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
         {
           "path": "frontend/src/pages/EntityList.jsx",
-          "line": "{monthlyError && <p className=\"error\" role=\"alert\">{monthlyError}</p>}"
-        },
-        {
-          "path": "frontend/src/pages/EntityList.jsx",
           "line": "{monthly === null ? <p>Loading monthly entries\u2026</p> : !monthly.length ? <p className=\"muted\">No entries scheduled for this month.</p> : <div className=\"table-scroll\"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Expected / amount</th><th>Account</th><th>Monthly amount</th></tr></thead><tbody>{monthly.map(row => <tr key={`${row.id}-${row.date}`} className={row.needsActual ? 'needs-actual' : ''}>"
         }
       ],
-      "note": "",
+      "note": "Variable rows needing a monthly actual value receive the needs-actual class, corresponding to the yellow highlight styling.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 21,
-      "text": "Income should be classified as fixed, variable, or extraordinary.",
+      "id": 24,
+      "text": "Income can be fixed, variable, or extraordinary.",
       "kind": "rule",
       "status": "implemented",
       "evidence": [
@@ -965,48 +1043,44 @@
           "line": "incomeType: IncomeType = IncomeType.EXTRAORDINARY"
         }
       ],
-      "note": "",
+      "note": "Income type supports fixed, variable, and extraordinary values, and income creation accepts the type.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; API: a workflow passed but called no cited route"
     },
     {
-      "id": 22,
-      "text": "Show income in a monthly view, and allow its expected value to be changed.",
+      "id": 25,
+      "text": "Income is shown by month, and its expected amount can be changed.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
         {
-          "path": "frontend/src/pages/EntityList.jsx",
-          "line": "{monthlyEntity && <section className=\"card\"><div className=\"month-heading\"><h2>Monthly entries</h2><div className=\"month-selectors\"><label className=\"field\">Month <select value={month} onChange={event => setMonth(Number(event.target.value))}>{Array.from({ length: 12 }, (_, index) => <option key={index + 1} value={index + 1}>{new Intl.DateTimeFormat('en', { month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, index, 1)))}</option>)}</select></label><label className=\"field\">Year <select value={year} onChange={event => setYear(Number(event.target.value))}>{Array.from({ length: 11 }, (_, index) => <option key={2026 + index} value={2026 + index}>{2026 + index}</option>)}</select></label></div></div>"
+          "path": "backend/monthly.py",
+          "line": "def monthly_rows(database: Session, kind: str, month: str):"
         },
         {
           "path": "backend/monthly.py",
-          "line": "'amount': amount, 'expectedValue': expected,"
-        },
-        {
-          "path": "frontend/src/pages/EntityList.jsx",
-          "line": "<td>{row.date}</td><td>{row.type === 'FIX' ? 'Fixed' : row.type === 'FIXED' ? 'Fixed' : row.type === 'VARIABLE' ? 'Variable' : 'Extraordinary'}</td><td>{row.description}</td>"
+          "line": "amount = overrides.get((record.id, day), record.amount if day == record.startDate and record.amount is not None and not variable else expected)"
         }
       ],
-      "note": "",
+      "note": "Income monthly rows are generated for a selected month, and per-occurrence changes are persisted through the monthly amount edit route.",
       "inspection_paths": [],
       "verification": "unverified",
-      "verification_note": "Found in the source; API: a workflow passed but called no cited route; screens: not run (the frontend builds)"
+      "verification_note": "Found in the source; API: a workflow passed but called no cited route"
     },
     {
-      "id": 23,
-      "text": "Require the user to choose the expense type before entering its amount.",
+      "id": 26,
+      "text": "Users can select the month for the income and expense monthly table views from a month list and select a year from 2026 through 2036.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
         {
-          "path": "frontend/src/entities.js",
-          "line": "{ name: 'expenseType', label: 'Expense type', type: 'enum', options: ['FIX', 'VARIABLE', 'EXTRAORDINARY'], required: true },"
+          "path": "frontend/src/pages/EntityList.jsx",
+          "line": "<label className=\"field\">Month <select value={month} onChange={event => setMonth(Number(event.target.value))}>{Array.from({ length: 12 }, (_, index) => <option key={index + 1} value={index + 1}>{new Intl.DateTimeFormat('en', { month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, index, 1)))}</option>)}</select></label>"
         },
         {
           "path": "frontend/src/pages/EntityList.jsx",
-          "line": "const displayedFields = config.fields.filter(field =>\n    ((entity !== 'expense' && entity !== 'income') || selectedType || !['amount', 'expectedValue', 'allowedDeviation', 'recurrenceIntervalMonths'].includes(field.name)) &&"
+          "line": "<label className=\"field\">Year <select value={year} onChange={event => setYear(Number(event.target.value))}>{Array.from({ length: 11 }, (_, index) => <option key={2026 + index} value={2026 + index}>{2026 + index}</option>)}</select></label>"
         }
       ],
       "note": "",
@@ -1015,9 +1089,29 @@
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
     },
     {
-      "id": 24,
-      "text": "For variable expenses, label the amount field \u201cThis months amount\u201d and make it optional.",
+      "id": 27,
+      "text": "When creating or updating an expense, users select the expense type before entering the amount.",
       "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "frontend/src/entities.js",
+          "line": "{ name: 'expenseType', label: 'Expense type', type: 'enum', options: ['FIX', 'VARIABLE', 'EXTRAORDINARY'], required: true }"
+        },
+        {
+          "path": "frontend/src/pages/EntityList.jsx",
+          "line": "const displayedFields = config.fields.filter(field =>"
+        }
+      ],
+      "note": "",
+      "inspection_paths": [],
+      "verification": "unverified",
+      "verification_note": "Found in the source; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 28,
+      "text": "For a variable expense, the amount field is labeled \u201cThis months amount\u201d and is optional.",
+      "kind": "validation",
       "status": "implemented",
       "evidence": [
         {
@@ -1027,94 +1121,6 @@
         {
           "path": "frontend/src/pages/EntityList.jsx",
           "line": "required: (field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(selectedType)) || (field.name === 'amount' && ((entity === 'expense' && values.expenseType !== 'VARIABLE') || (entity === 'income' && values.incomeType === 'EXTRAORDINARY')))) && !(field.name === 'amount' && selectedType === 'VARIABLE')"
-        },
-        {
-          "path": "frontend/src/entities.js",
-          "line": "{ name: 'amount', label: 'Amount', type: 'number', min: '0.01' },"
-        }
-      ],
-      "note": "",
-      "inspection_paths": [],
-      "verification": "unverified",
-      "verification_note": "Found in the source; screens: not run (the frontend builds)"
-    },
-    {
-      "id": 25,
-      "text": "Require the user to choose the income type before entering the average and deviation values, and allow an optional current-month value.",
-      "kind": "ui",
-      "status": "implemented",
-      "evidence": [
-        {
-          "path": "frontend/src/entities.js",
-          "line": "{ name: 'incomeType', label: 'Income type', type: 'enum', options: ['FIXED', 'VARIABLE', 'EXTRAORDINARY'], required: true },"
-        },
-        {
-          "path": "frontend/src/pages/EntityList.jsx",
-          "line": "((entity !== 'expense' && entity !== 'income') || selectedType || !['amount', 'expectedValue', 'allowedDeviation', 'recurrenceIntervalMonths'].includes(field.name)) &&"
-        },
-        {
-          "path": "frontend/src/pages/EntityList.jsx",
-          "line": "label: field.name === 'amount' && ((entity === 'expense' && values.expenseType === 'VARIABLE') || (entity === 'income' && values.incomeType === 'VARIABLE')) ? 'This months amount' : field.label,"
-        },
-        {
-          "path": "frontend/src/entities.js",
-          "line": "{ name: 'amount', label: 'Amount', type: 'number', min: '0.01' },"
-        }
-      ],
-      "note": "",
-      "inspection_paths": [],
-      "verification": "unverified",
-      "verification_note": "Found in the source; screens: not run (the frontend builds)"
-    },
-    {
-      "id": 26,
-      "text": "Do not check whether a monthly income or expense value is outside its stipulated range when the user updates it.",
-      "kind": "validation",
-      "status": "implemented",
-      "evidence": [
-        {
-          "path": "backend/monthly.py",
-          "line": "amount: float"
-        }
-      ],
-      "note": "",
-      "inspection_paths": [],
-      "verification": "unverified",
-      "verification_note": "Found in the source; API: a workflow passed but called no cited route"
-    },
-    {
-      "id": 27,
-      "text": "Show on the Overview page a list of each occurrence when an expense was above its stipulated monthly value (average + variation).",
-      "kind": "ui",
-      "status": "implemented",
-      "evidence": [
-        {
-          "path": "backend/main_api.py",
-          "line": "@app.get('/overview/overages/', tags=['System'])"
-        },
-        {
-          "path": "backend/main_api.py",
-          "line": "if actual is not None and Decimal(str(actual)) > threshold:"
-        },
-        {
-          "path": "frontend/src/pages/Dashboard.jsx",
-          "line": "<section className=\"card\"><h3>Expenses above the stipulated monthly value</h3><p className=\"muted\">Recorded expenses exceeding their average plus deviation.</p>"
-        }
-      ],
-      "note": "The Overview dashboard fetches and renders an overages list; backend computes each expense occurrence exceeding expected value plus deviation.",
-      "inspection_paths": [],
-      "verification": "unverified",
-      "verification_note": "Found in the source; API: a workflow passed but called no cited route; screens: not run (the frontend builds)"
-    },
-    {
-      "id": 28,
-      "text": "For the monthly income and expense tables, let users select a month from a list and select a year from 2026 through 2036.",
-      "kind": "ui",
-      "status": "implemented",
-      "evidence": [
-        {
-          "path": "frontend/src/pages/EntityList.jsx",
-          "line": "{monthlyEntity && <section className=\"card\"><div className=\"month-heading\"><h2>Monthly entries</h2><div className=\"month-selectors\"><label className=\"field\">Month <select value={month} onChange={event => setMonth(Number(event.target.value))}>{Array.from({ length: 12 }, (_, index) => <option key={index + 1} value={index + 1}>{new Intl.DateTimeFormat('en', { month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, index, 1)))}</option>)}</select></label><label className=\"field\">Year <select value={year} onChange={event => setYear(Number(event.target.value))}>{Array.from({ length: 11 }, (_, index) => <option key={2026 + index} value={2026 + index}>{2026 + index}</option>)}</select></label></div></div>"
         }
       ],
       "note": "",
@@ -1124,7 +1130,67 @@
     },
     {
       "id": 29,
-      "text": "In the main menu, collapse an open Accounts or Entries submenu when the user clicks elsewhere on the page.",
+      "text": "When creating or updating income, users select the income type first, then can enter an average and deviation value and optionally a value for the current month.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "frontend/src/entities.js",
+          "line": "{ name: 'incomeType', label: 'Income type', type: 'enum', options: ['FIXED', 'VARIABLE', 'EXTRAORDINARY'], required: true }"
+        },
+        {
+          "path": "frontend/src/entities.js",
+          "line": "{ name: 'expectedValue', label: 'Average amount', type: 'number', min: '0.01', incomeRecurring: true, required: true }"
+        },
+        {
+          "path": "frontend/src/entities.js",
+          "line": "{ name: 'allowedDeviation', label: 'Deviation (\u00b1)', type: 'number', min: '0', incomeRecurring: true, required: true }"
+        }
+      ],
+      "note": "",
+      "inspection_paths": [],
+      "verification": "unverified",
+      "verification_note": "Found in the source; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 30,
+      "text": "Updating a monthly income or expense amount does not check whether the value is within its stipulated range.",
+      "kind": "rule",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/monthly.py",
+          "line": "amount: float"
+        }
+      ],
+      "note": "Monthly edits validate that the submitted value is positive and finite but do not compare it against expected minimum/maximum bounds.",
+      "inspection_paths": [],
+      "verification": "unverified",
+      "verification_note": "Found in the source; API: a workflow passed but called no cited route"
+    },
+    {
+      "id": 31,
+      "text": "The overview page lists each occasion when an expense exceeded its stipulated monthly value (average plus variation).",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "@app.get('/overview/overages/', tags=['System'])"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<section className=\"card\"><h3>Expenses above the stipulated monthly value</h3>"
+        }
+      ],
+      "note": "The overview lists dated recorded expense occurrences over expected value plus deviation.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 32,
+      "text": "The main menu\u2019s Accounts or Entries submenu collapses when the user clicks elsewhere on the page.",
       "kind": "ui",
       "status": "implemented",
       "evidence": [
@@ -1134,46 +1200,364 @@
         },
         {
           "path": "frontend/src/App.jsx",
-          "line": "navigationRef.current?.querySelectorAll('details.nav-menu[open]').forEach(menu => { menu.open = false })"
-        },
-        {
-          "path": "frontend/src/App.jsx",
           "line": "document.addEventListener('pointerdown', closeOnOutsideClick)"
         }
       ],
-      "note": "",
+      "note": "A document pointerdown outside the navigation closes any open Accounts or Entries details submenu.",
       "inspection_paths": [],
       "verification": "unverified",
       "verification_note": "Found in the source; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 33,
+      "text": "The dashboard shows current net worth as today\u2019s total balance across accounts, its change since last month, and a small trend line.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['todayBalance'] = sum(balance_on(a, today) for a in selected)"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"dashboard-grid\"><div className=\"card\"><h4>Current balance \u00b7 net worth</h4><strong className=\"big-number\">{money(summary.todayBalance, currency)}</strong><p className={summary.changeSinceLastMonth >= 0 ? 'balance-positive' : 'balance-negative'}>Since last month: {summary.changeSinceLastMonth >= 0 ? '+' : ''}{money(summary.changeSinceLastMonth, currency)}</p><Trend values={summary.balanceTrend} label=\"Balance over six months\" /></div>"
+        }
+      ],
+      "note": "The dashboard displays current net worth, month-over-month change, and a trend line.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 34,
+      "text": "The dashboard shows each account\u2019s balance today and a six-month trend line, replacing the account-selection dropdown.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"card\"><h4>Account balances today</h4>{summary.accounts.map(account => <div className=\"account-trend\" key={account.id}><Link to={`/account/${account.id}/edit`}>{account.name}</Link><strong>{money(account.todayBalance, currency)}</strong><Trend values={account.balanceTrend} label={`${account.name} six-month balance trend`} /></div>)}</div>"
+        }
+      ],
+      "note": "Each account is shown with today's balance and its six-month trend; no account-selection dropdown is used for this readout.",
+      "inspection_paths": [],
+      "verification": "unverified",
+      "verification_note": "Found in the source; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 35,
+      "text": "The dashboard shows income received versus expected and expenses so far versus planned for the current month as two progress bars.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"card\"><h4>This month so far</h4><div className=\"dashboard-grid\"><Progress label=\"Income received vs expected\" value={summary.monthToDate.incomeReceived} total={summary.monthToDate.incomeExpected} currency={currency}/><Progress label=\"Expenses so far vs planned\" value={summary.monthToDate.expensesSpent} total={summary.monthToDate.expensesPlanned} currency={currency}/></div><p className=\"key-figure\">Left to spend this month: <strong>{money(summary.monthToDate.leftToSpend, currency)}</strong></p></div>"
+        }
+      ],
+      "note": "Income and expense progress bars render received/spent amounts against expected/planned values.",
+      "inspection_paths": [],
+      "verification": "unverified",
+      "verification_note": "Found in the source; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 36,
+      "text": "The dashboard shows \u201cLeft to spend this month\u201d as expected income minus committed fixed costs minus expenses already spent.",
+      "kind": "computed",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "'leftToSpend': expected_month_income - fixed - spent, 'fixedCosts': fixed,"
+        }
+      ],
+      "note": "The computed amount subtracts scheduled fixed expenses and already spent expenses from expected monthly income.",
+      "inspection_paths": [],
+      "verification": "verified",
+      "verification_note": "Cited in the source; API: a passing workflow called GET /dashboard/, the cited route"
+    },
+    {
+      "id": 37,
+      "text": "The dashboard identifies variable expenses and income for the current month that have no amount entered and provides a link to those entries.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['missingAmounts'] = [{'id': row['id'], 'kind': row['kind'], 'description': row['description'], 'date': row['date']}"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"card\"><h4>Missing monthly amounts</h4><strong className=\"big-number\">{summary.missingAmounts.length}</strong><p>Variable entries need this month\u2019s amount.</p>{['income', 'expense'].map(kind => { const count = summary.missingAmounts.filter(row => row.kind === kind).length; return count ? <p key={kind}><Link to={`/${kind}`}>{count} {kind} {count === 1 ? 'entry' : 'entries'} need an amount \u2192</Link></p> : null })}{!summary.missingAmounts.length && <p className=\"muted\">All amounts are up to date.</p>}</div>"
+        }
+      ],
+      "note": "Missing variable income and expense amounts are identified from monthly rows, counted, and linked to their respective entry lists.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 38,
+      "text": "The dashboard shows a timeline of bills and income due in the next 14 days, including each item\u2019s date, amount, and account.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['timeline'] = sorted(timeline, key=lambda row: (row['date'], row['description']))"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"dashboard-grid\"><div className=\"card\"><h4>Coming up in the next 14 days</h4>{summary.timeline.length ? <ul className=\"dashboard-list\">{summary.timeline.map((item, index) => <li key={`${item.date}-${item.account_id}-${index}`}><span>{item.date} \u00b7 {item.description} ({item.account})</span><strong>{item.kind === 'expense' ? '\u2212' : '+'}{money(item.amount, currency)}</strong>{item.kind === 'expense' && <small className={item.canCover ? 'balance-positive' : 'balance-negative'}>{item.canCover ? 'Covered' : 'Account may not cover this bill'}</small>}</li>)}</ul> : <p className=\"muted\">No bills or income due in the next 14 days.</p>}</div>"
+        }
+      ],
+      "note": "The backend builds an event timeline through today plus 14 days and the UI displays each date, amount, and account.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 39,
+      "text": "The dashboard warns about the first month an account or group is projected to fall below zero or a threshold, identifying the account or group, projected balance, and month.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "first_low = next((row for row in item['months'] if row['endBalance'] < low_balance_threshold), None)"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"card\"><h4>First low-balance warning</h4>{summary.lowBalance ? <><p><strong>{summary.lowBalance.name}</strong> reaches {money(summary.lowBalance.balance, currency)} in {summary.lowBalance.month}.</p>{summary.lowBalance.transferFrom && <p>Consider a transfer from {summary.lowBalance.transferFrom}. <Link to=\"/transfer\">View transfers \u2192</Link></p>}</> : <p className=\"muted\">No account or group projected below zero.</p>}</div>"
+        }
+      ],
+      "note": "The dashboard takes the first projected month below the configured threshold for accounts and groups and identifies the name, balance, and month.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 40,
+      "text": "The dashboard\u2019s low-balance warning can suggest a transfer.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['lowBalance']['transferFrom'] = candidate['name'] if candidate else None"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "{summary.lowBalance.transferFrom && <p>Consider a transfer from {summary.lowBalance.transferFrom}. <Link to=\"/transfer\">View transfers \u2192</Link></p>}"
+        }
+      ],
+      "note": "When a potential funding account is found, the low-balance warning suggests a transfer and links to Transfers.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 41,
+      "text": "The dashboard shows a compact off-plan entries summary with a count and worst case, covering expenses above their stipulated limit and income below its expected minimum.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['offPlan'] = {'count': len(off_plan), 'worst': max(off_plan, key=lambda row: row['difference']) if off_plan else None}"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"card\"><h4>Off-plan entries this month</h4><strong className=\"big-number\">{summary.offPlan.count}</strong>{summary.offPlan.worst ? <p>Worst: {summary.offPlan.worst.description} ({summary.offPlan.worst.kind}), {money(summary.offPlan.worst.difference, currency)} {summary.offPlan.worst.kind === 'income' ? 'below minimum' : 'above limit'}.</p> : <p className=\"muted\">Nothing recorded outside its expected range.</p>}</div>"
+        }
+      ],
+      "note": "The off-plan summary counts out-of-range recorded amounts and displays the worst; its backend compares expenses to maximum and income to minimum.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 42,
+      "text": "The dashboard shows spending by fixed, variable, and extraordinary type as a stacked bar and shows the share of income committed to fixed costs.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"dashboard-grid\"><div className=\"card\"><h4>Fixed vs variable vs extraordinary</h4><div className=\"stacked-bar\" role=\"img\" aria-label=\"Spending by type\">{Object.entries(summary.spendingTypes).map(([kind, amount]) => <span key={kind} className={`stack-${kind}`} style={{ width: `${summary.monthToDate.expensesPlanned ? amount / summary.monthToDate.expensesPlanned * 100 : 0}%` }} title={`${kind}: ${money(amount, currency)}`} />)}</div><p>{Object.entries(summary.spendingTypes).map(([kind, amount]) => `${kind}: ${money(amount, currency)}`).join(' \u00b7 ')}</p><strong>{summary.monthToDate.monthlyIncomeExpected ? (summary.monthToDate.fixedCosts / summary.monthToDate.monthlyIncomeExpected * 100).toFixed(0) : '\u2014'}% of expected income committed to fixed costs</strong></div>"
+        },
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['spendingTypes'] = {kind: sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0 for row in scheduled if row['kind'] == 'expense' and row['type'] in types)"
+        }
+      ],
+      "note": "The dashboard renders the three expense types as a stacked bar and displays fixed costs as a percentage of expected monthly income.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 43,
+      "text": "The dashboard compares each current-month category amount with its average over the last 3\u20136 months and shows the difference.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['categoryComparison'] = [{'name': name, 'current': value,"
+        },
+        {
+          "path": "backend/main_api.py",
+          "line": "'average': sum(past.get(name, 0) for past in history) / len(history)}"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"card\"><h4>Category vs usual \u00b7 previous six months</h4>{summary.categoryComparison.length ? <ul className=\"dashboard-list\">{summary.categoryComparison.map(item => <li key={item.name}><span>{item.name}</span><strong>{money(item.current, currency)}</strong><small>Usual {money(item.average, currency)} \u00b7 {item.average ? `${item.current >= item.average ? '+' : ''}${((item.current - item.average) / item.average * 100).toFixed(0)}%` : 'No prior spending'}</small></li>)}</ul> : <p className=\"muted\">No category spending this month.</p>}</div>"
+        }
+      ],
+      "note": "Current expense category totals are compared against the average across six prior monthly rows, and the UI calculates and displays the percentage difference.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 44,
+      "text": "The dashboard lists recurring expenses converted to yearly costs, sorted from largest to smallest.",
+      "kind": "computed",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['recurringCosts'] = sorted([{'description': e.description, 'yearly': (e.expectedValue or e.amount or 0) * 12 / e.recurrenceIntervalMonths,"
+        },
+        {
+          "path": "backend/main_api.py",
+          "line": "key=lambda item: -item['yearly'])"
+        }
+      ],
+      "note": "Recurring expense yearly cost is calculated as amount \u00d7 12 \u00f7 interval and sorted descending.",
+      "inspection_paths": [],
+      "verification": "verified",
+      "verification_note": "Cited in the source; API: a passing workflow called GET /dashboard/, the cited route"
+    },
+    {
+      "id": 45,
+      "text": "The dashboard identifies entries whose end date falls within the next few months and shows the resulting monthly amount freed when applicable.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['endingSoon'] = [{'description': e.description, 'endDate': e.endDate.isoformat(),"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"dashboard-grid\"><div className=\"card\"><h4>Recurring costs per year</h4>{summary.recurringCosts.length ? <ul className=\"dashboard-list\">{summary.recurringCosts.map((item, index) => <li key={index}><span>{item.description}</span><strong>{money(item.yearly, currency)}/year</strong><small>{money(item.monthly, currency)}/month</small></li>)}</ul> : <p className=\"muted\">No recurring expenses.</p>}</div><div className=\"card\"><h4>Ending soon \u00b7 next three months</h4>{summary.endingSoon.length ? <ul className=\"dashboard-list\">{summary.endingSoon.map((item, index) => <li key={index}><span>{item.description} \u00b7 {item.endDate}</span><strong>{item.monthlyChange >= 0 ? '+' : ''}{money(item.monthlyChange, currency)}/month</strong></li>)}</ul> : <p className=\"muted\">No entries ending soon.</p>}</div></div>"
+        }
+      ],
+      "note": "The dashboard identifies recurring entries ending within three months and displays the end date and monthly change/freeing amount.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 46,
+      "text": "The dashboard shows a line chart of projected end balance per month, marks the lowest projected balance and its month, and retains the table as a detail view.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"card\"><h4>Projected end balance</h4><Trend values={summary.months.map(row => row.endBalance)} label=\"Projected monthly end balances\" low/><p>Lowest: {money(Math.min(...summary.months.map(row => row.endBalance)), currency)} in {summary.months.reduce((lowest, row) => row.endBalance < lowest.endBalance ? row : lowest).month}</p></div>"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "{view === 'total' ? <CashflowTable title={`All accounts \u00b7 ${currency}`} months={summary.months}/> : view === 'account' ? summary.accounts.map(account => <CashflowTable key={account.id} title={account.name} months={account.months}/>) : summary.groups.length ? summary.groups.map(group => <CashflowTable key={group.id} title={group.name} months={group.months}/>) : <div className=\"card empty\">No groups in {currency} yet. <Link to=\"/accountgroup/new\">Create a group \u2192</Link></div>"
+        }
+      ],
+      "note": "The projected end-balance trend is charted, the lowest value and associated month are called out, and cashflow tables remain selectable below as detail.",
+      "inspection_paths": [],
+      "verification": "unverified",
+      "verification_note": "Found in the source; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 47,
+      "text": "The dashboard shows a monthly savings-rate trend calculated as (income minus expenses) divided by income.",
+      "kind": "computed",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['savingsRates'] = [{'month': row['month'], 'rate': (row['income'] - row['spending']) / row['income'] * 100 if row['income'] else None} for row in summary['months']]"
+        }
+      ],
+      "note": "Monthly savings rate is computed as (income minus expenses) divided by income (shown as a percentage).",
+      "inspection_paths": [],
+      "verification": "verified",
+      "verification_note": "Cited in the source; API: a passing workflow called GET /dashboard/, the cited route"
+    },
+    {
+      "id": 48,
+      "text": "The dashboard shows large one-off or yearly expenses due in the next 12 months and how much to set aside each month for them.",
+      "kind": "ui",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['bigUpcoming'] = sorted((row for row in upcoming if row['amount'] > typical and row['amount'] > 0),"
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.jsx",
+          "line": "<div className=\"card\"><h4>Big upcoming one-off or yearly expenses \u00b7 next 12 months</h4>{summary.bigUpcoming.length ? <ul className=\"dashboard-list\">{summary.bigUpcoming.map((item, index) => <li key={index}><span>{item.description} \u00b7 {item.date}</span><strong>{money(item.amount, currency)}</strong><small>Set aside {money(item.monthlySetAside, currency)}/month</small></li>)}</ul> : <p className=\"muted\">No upcoming one-off or yearly expenses.</p>}</div>"
+        }
+      ],
+      "note": "The dashboard filters upcoming one-off/yearly expenses and shows amount, date, and monthly set-aside.",
+      "inspection_paths": [],
+      "verification": "api_verified",
+      "verification_note": "Found in the source; API: a passing workflow called GET /dashboard/, the cited route; screens: not run (the frontend builds)"
+    },
+    {
+      "id": 49,
+      "text": "The dashboard shows emergency cover calculated as current balance divided by average monthly fixed expenses.",
+      "kind": "computed",
+      "status": "implemented",
+      "evidence": [
+        {
+          "path": "backend/main_api.py",
+          "line": "summary['emergencyCover'] = summary['todayBalance'] / average_fixed if average_fixed else None"
+        }
+      ],
+      "note": "The dashboard computes emergency cover by dividing the current total balance by its derived average monthly fixed-expense value (or returns None if that denominator is zero).",
+      "inspection_paths": [],
+      "verification": "verified",
+      "verification_note": "Cited in the source; API: a passing workflow called GET /dashboard/, the cited route"
     }
   ],
   "business_rules_stated": true,
   "api_scenarios": [
     {
-      "scenario_id": "existing-expense-income-transfer-create-read",
+      "scenario_id": "dashboard-valid-expense-income-transfer",
       "scenario": {
         "requests": [
           {
             "method": "POST",
             "path": "/account/",
             "json": {
-              "currency": "EUR",
               "name": "Checking",
-              "openingBalance": 1000,
-              "openingBalanceDate": "2026-11-01"
-            },
-            "expected_status": 200
+              "currency": "EUR",
+              "openingBalance": 500,
+              "openingBalanceDate": "2026-01-01"
+            }
           },
           {
             "method": "POST",
             "path": "/account/",
             "json": {
-              "currency": "EUR",
               "name": "Savings",
-              "openingBalance": 500,
-              "openingBalanceDate": "2026-11-01"
-            },
-            "expected_status": 200
+              "currency": "EUR",
+              "openingBalance": 1000,
+              "openingBalanceDate": "2026-01-01"
+            }
           },
           {
             "method": "POST",
@@ -1181,17 +1565,15 @@
             "json": {
               "account": "{{0.account.id}}",
               "description": "Rent",
-              "expenseType": "FIX",
-              "amount": 200,
               "startDate": "2026-11-01",
+              "expenseType": "FIX",
+              "amount": 150,
               "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
+            }
           },
           {
             "method": "GET",
             "path": "/expense/{{2.id}}/",
-            "expected_status": 200,
             "expected_fields": {
               "expense.description": "Rent"
             }
@@ -1201,21 +1583,19 @@
             "path": "/income/",
             "json": {
               "account": "{{0.account.id}}",
-              "description": "Salary",
-              "incomeType": "VARIABLE",
-              "expectedValue": 1000,
-              "allowedDeviation": 100,
+              "description": "Pay",
               "startDate": "2026-11-01",
+              "incomeType": "FIXED",
+              "expectedValue": 300,
+              "allowedDeviation": 20,
               "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
+            }
           },
           {
             "method": "GET",
             "path": "/income/{{4.id}}/",
-            "expected_status": 200,
             "expected_fields": {
-              "income.description": "Salary"
+              "income.description": "Pay"
             }
           },
           {
@@ -1224,20 +1604,25 @@
             "json": {
               "fromAccount": "{{0.account.id}}",
               "toAccount": "{{1.account.id}}",
-              "amount": 50,
-              "date": "2026-11-01",
-              "description": "Savings transfer",
-              "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
+              "amount": 25,
+              "date": "2026-11-02"
+            }
           },
           {
             "method": "GET",
             "path": "/transfer/{{6.id}}/",
-            "expected_status": 200,
             "expected_fields": {
-              "transfer.description": "Savings transfer",
-              "transfer.recurrenceIntervalMonths": 1
+              "transfer.amount": 25
+            }
+          },
+          {
+            "method": "GET",
+            "path": "/dashboard/",
+            "expected_fields": {
+              "currencies.EUR.todayBalance": 1650,
+              "currencies.EUR.monthToDate.leftToSpend": 0,
+              "currencies.EUR.monthToDate.expensesPlanned": 150,
+              "currencies.EUR.spendingTypes.fixed": 150
             }
           }
         ],
@@ -1245,11 +1630,7 @@
       },
       "correction_history": [
         {
-          "reason": "A transfer between different currency accounts is rightly refused; use two EUR accounts to test a valid transfer without weakening currency validation.",
-          "previous_status": "failed"
-        },
-        {
-          "reason": "The transfer GET response wraps the record in a transfer key; correct only the assertion path.",
+          "reason": "A transfer between two selected accounts cancels in combined net worth, so the correct total is 1500 + 300 - 150 = 1650; with 150 fixed costs and 150 already spent, left to spend is 300 - 150 - 150 = 0.",
           "previous_status": "failed"
         }
       ],
@@ -1265,10 +1646,10 @@
             "status": 200,
             "json": {
               "account": {
-                "openingBalanceDate": "2026-11-01",
                 "id": 1,
+                "openingBalanceDate": "2026-01-01",
+                "openingBalance": 500.0,
                 "name": "Checking",
-                "openingBalance": 1000.0,
                 "currency": "EUR"
               },
               "accountgroup_ids": [],
@@ -1285,10 +1666,10 @@
             "status": 200,
             "json": {
               "account": {
-                "openingBalanceDate": "2026-11-01",
                 "id": 2,
+                "openingBalanceDate": "2026-01-01",
+                "openingBalance": 1000.0,
                 "name": "Savings",
-                "openingBalance": 500.0,
                 "currency": "EUR"
               },
               "accountgroup_ids": [],
@@ -1304,13 +1685,13 @@
             "failures": [],
             "status": 200,
             "json": {
-              "startDate": "2026-11-01",
-              "description": "Rent",
               "id": 1,
+              "description": "Rent",
+              "startDate": "2026-11-01",
               "recurrenceIntervalMonths": 1,
               "category_id": null,
               "expenseType": "FIX",
-              "amount": 200.0,
+              "amount": 150.0,
               "endDate": null,
               "account_id": 1,
               "type_spec": "expense",
@@ -1328,13 +1709,13 @@
             "status": 200,
             "json": {
               "expense": {
-                "startDate": "2026-11-01",
-                "description": "Rent",
                 "id": 1,
+                "description": "Rent",
+                "startDate": "2026-11-01",
                 "recurrenceIntervalMonths": 1,
                 "category_id": null,
                 "expenseType": "FIX",
-                "amount": 200.0,
+                "amount": 150.0,
                 "endDate": null,
                 "account_id": 1,
                 "type_spec": "expense",
@@ -1355,18 +1736,18 @@
             "failures": [],
             "status": 200,
             "json": {
-              "startDate": "2026-11-01",
-              "description": "Salary",
               "id": 2,
+              "description": "Pay",
+              "startDate": "2026-11-01",
               "recurrenceIntervalMonths": 1,
               "category_id": null,
-              "incomeType": "VARIABLE",
-              "amount": 1000.0,
+              "incomeType": "FIXED",
+              "amount": 300.0,
               "endDate": null,
               "account_id": 1,
               "type_spec": "income",
-              "expectedValue": 1000.0,
-              "allowedDeviation": 100.0
+              "expectedValue": 300.0,
+              "allowedDeviation": 20.0
             },
             "truncated": false,
             "failure_count": 0
@@ -1379,18 +1760,18 @@
             "status": 200,
             "json": {
               "income": {
-                "startDate": "2026-11-01",
-                "description": "Salary",
                 "id": 2,
+                "description": "Pay",
+                "startDate": "2026-11-01",
                 "recurrenceIntervalMonths": 1,
                 "category_id": null,
-                "incomeType": "VARIABLE",
-                "amount": 1000.0,
+                "incomeType": "FIXED",
+                "amount": 300.0,
                 "endDate": null,
                 "account_id": 1,
                 "type_spec": "income",
-                "expectedValue": 1000.0,
-                "allowedDeviation": 100.0
+                "expectedValue": 300.0,
+                "allowedDeviation": 20.0
               }
             },
             "truncated": false,
@@ -1406,13 +1787,13 @@
             "failures": [],
             "status": 200,
             "json": {
-              "date": "2026-11-01",
-              "fromAccount_id": 1,
-              "recurrenceIntervalMonths": 1,
+              "date": "2026-11-02",
               "toAccount_id": 2,
+              "recurrenceIntervalMonths": null,
+              "amount": 25.0,
               "id": 1,
-              "amount": 50.0,
-              "description": "Savings transfer",
+              "fromAccount_id": 1,
+              "description": "",
               "endDate": null
             },
             "truncated": false,
@@ -1426,20 +1807,33 @@
             "status": 200,
             "json": {
               "transfer": {
-                "date": "2026-11-01",
-                "fromAccount_id": 1,
-                "recurrenceIntervalMonths": 1,
+                "date": "2026-11-02",
                 "toAccount_id": 2,
+                "recurrenceIntervalMonths": null,
+                "amount": 25.0,
                 "id": 1,
-                "amount": 50.0,
-                "description": "Savings transfer",
+                "fromAccount_id": 1,
+                "description": "",
                 "endDate": null
               }
             },
             "truncated": false,
             "reads_back": [
-              2,
               6
+            ],
+            "failure_count": 0
+          },
+          {
+            "index": 8,
+            "method": "GET",
+            "path": "/dashboard/",
+            "failures": [],
+            "status": 200,
+            "json": "{\"asOf\": \"2026-11-26\", \"currencies\": {\"EUR\": {\"months\": [{\"month\": \"2026-11\", \"income\": 325.0, \"spending\": 175.0, \"endBalance\": 1650.0}, {\"month\": \"2026-12\", \"income\": 300.0, \"spending\": 150.0, \"endBalance\": 1800.0}, {\"month\": \"2027-01\", \"income\": 300.0, \"spending\": 150.0, \"endBalance\": 1950.0}, {\"month\": \"2027-02\", \"income\": 300.0, \"spending\": 150.0, \"endBalance\": 2100.0}, {\"month\": \"2027-03\", \"income\": 300.0, \"spending\": 150.0, \"endBalance\": 2250.0}, {\"month\": \"2027-04\", \"income\": 300.0, \"spending\": 150.0, \"endBalance\": 2400.0}], \"currentMonthSpending\": 175.0, \"futureMonthSpending\": 750.0, \"averageMonthlySpending\": 154.17, \"accounts\": [{\"id\": 1, \"name\": \"Checking\", \"months\": [{\"month\": \"2026-11\", \"income\": 300.0, \"spending\": 175.0, \"endBalance\": 625.0}, {\"month\": \"2026-12\", \"income\": 300.0, \"spending\": 150.0, \"endBalance\": 775.0}, {\"month\": \"2027-01\", \"income\": 300.0, \"spending\": 150.0, \"endBalance\": 925.0}, {\"month\": \"2027-02\", \"income\": 300.0, \"spending\": 150.0, \"endBalance\": 1075.0}, {\"month\": \"2027-03\", \"income\": 300.0, \"spending\": 150.0, \"endBalance\": 1225.0}, {\"month\": \"2027-04\", \"income\": 300.0, \"spending\": 150.0, \"endBalance\": 1375.0}], \"todayBalance\": 625.0, \"balanceTrend\": [500.0, 500.0, 500.0, 500.0, 500.0, 625.0]}, {\"id\": 2, \"name\": \"Savings\", \"months\": [{\"month\": \"2026-11\", \"income\": 25.0, \"spending\": 0.0, \"endBalance\": 1025.0}, {\"month\": \"2026-12\", \"income\": 0.0, \"spending\": 0.0, \"endBalance\": 1025.0}, {\"month\": \"2027-01\", \"income\": 0.0, \"spending\": 0.0, \"endBalance\": 1025.0}, {\"month\": \"2027-02\", \"income\": 0.0, \"spending\": 0.0, \"endBalance\": 1025.0}, {\"month\": \"2027-03\", \"income\": 0.0, \"spending\": 0.0, \"endBalance\": 1025.0}, {\"month\": \"2027-04\", \"income\": 0.0, \"spending\": 0.0, \"endBalance\": 1025.0}], \"todayBalance\": 1025.0, \"balanceTrend\": [1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1025.0]}], \"groups\": [], \"categories\": {\"income\": [{\"name\": \"Uncategorized\", \"amount\": 300.0}], \"expense\": [{\"name\": \"Uncategorized\", \"amount\": 150.0}]}, \"todayBalance\": 16 [truncated]",
+            "truncated": true,
+            "reads_back": [
+              0,
+              1
             ],
             "failure_count": 0
           }
@@ -1447,7 +1841,7 @@
         "assertion_failures": [],
         "scope": "Only the submitted scenario was checked; this is not complete specification verification.",
         "backend": "backend",
-        "scenario_id": "existing-expense-income-transfer-create-read"
+        "scenario_id": "dashboard-valid-expense-income-transfer"
       }
     }
   ],
@@ -1455,13 +1849,13 @@
   "model_conversion_issues": [],
   "model_assembly_issues": [],
   "usage": {
-    "api_calls": 39,
-    "input_tokens": 223759,
-    "output_tokens": 17208,
+    "api_calls": 58,
+    "input_tokens": 354318,
+    "output_tokens": 34333,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 695916,
-    "total_tokens": 936883,
-    "estimated_cost_usd": 0.4018,
+    "cache_read_tokens": 2234522,
+    "total_tokens": 2623173,
+    "estimated_cost_usd": 0.9239,
     "billed_to_user": true,
     "model": "openai/gpt-6-sol"
   },
@@ -1552,6 +1946,11 @@
       "source": "llm"
     },
     {
+      "path": ".agent-trace/b2c8d9ca288b4c279113e553b32754dc.json",
+      "size": 125750,
+      "source": "llm"
+    },
+    {
       "path": ".agent-trace/e8b3eb36da804a1b84f47852bff0e20c.json",
       "size": 108360,
       "source": "llm"
@@ -1603,8 +2002,9 @@
     },
     {
       "path": "backend/cashflow.py",
-      "size": 6137,
-      "source": "llm"
+      "size": 6000,
+      "source": "llm",
+      "llm_modified": true
     },
     {
       "path": "backend/database.py",
@@ -1614,14 +2014,15 @@
     },
     {
       "path": "backend/main_api.py",
-      "size": 14545,
+      "size": 26555,
       "source": "generator",
       "llm_modified": true
     },
     {
       "path": "backend/monthly.py",
-      "size": 4520,
-      "source": "llm"
+      "size": 4561,
+      "source": "llm",
+      "llm_modified": true
     },
     {
       "path": "backend/pydantic_classes.py",
@@ -1671,7 +2072,7 @@
     },
     {
       "path": "backend/routers/revenue.py",
-      "size": 12075,
+      "size": 12933,
       "source": "generator",
       "llm_modified": true
     },
@@ -1714,8 +2115,7 @@
     {
       "path": "frontend/src/App.jsx",
       "size": 2336,
-      "source": "llm",
-      "llm_modified": true
+      "source": "llm"
     },
     {
       "path": "frontend/src/api.js",
@@ -1725,8 +2125,7 @@
     {
       "path": "frontend/src/entities.js",
       "size": 4148,
-      "source": "llm",
-      "llm_modified": true
+      "source": "llm"
     },
     {
       "path": "frontend/src/main.jsx",
@@ -1735,15 +2134,14 @@
     },
     {
       "path": "frontend/src/pages/Dashboard.jsx",
-      "size": 6413,
+      "size": 14416,
       "source": "llm",
       "llm_modified": true
     },
     {
       "path": "frontend/src/pages/EntityList.jsx",
       "size": 14221,
-      "source": "llm",
-      "llm_modified": true
+      "source": "llm"
     },
     {
       "path": "frontend/src/pages/Transfers.jsx",
@@ -1752,8 +2150,9 @@
     },
     {
       "path": "frontend/src/style.css",
-      "size": 7275,
-      "source": "llm"
+      "size": 8632,
+      "source": "llm",
+      "llm_modified": true
     },
     {
       "path": "frontend/vite.config.js",
@@ -1762,653 +2161,24 @@
     }
   ],
   "output_summary": {
-    "total_files": 44,
+    "total_files": 45,
     "from_generator": 13,
-    "from_llm": 31,
+    "from_llm": 32,
     "generator_files_edited_by_llm": 10,
-    "total_bytes": 809121
+    "total_bytes": 957003
   },
   "tool_calls": [
     {
       "turn": 1,
       "tool": "read_file",
       "input": {
-        "path": "frontend/package.json"
+        "path": "backend/main_api.py"
       },
       "success": true,
       "status": "ok"
     },
     {
       "turn": 1,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/style.css"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 1,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/App.jsx"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 1,
-      "tool": "task_list",
-      "input": {
-        "action": "list"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 2,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/App.jsx",
-        "old_text": "import React from 'react'",
-        "new_text": "import React, { useEffect, useRef } from 'react'"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 3,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/App.jsx",
-        "old_text": "export default function App() {\n  return <BrowserRouter>",
-        "new_text": "export default function App() {\n  const navigationRef = useRef(null)\n\n  useEffect(() => {\n    const closeOnOutsideClick = (event) => {\n      if (!navigationRef.current?.contains(event.target)) {\n        navigationRef.current?.querySelectorAll('details.nav-menu[open]').forEach(menu => { menu.open = false })\n      }\n    }\n    document.addEventListener('pointerdown', closeOnOutsideClick)\n    return () => document.removeEventListener('pointerdown', closeOnOutsideClick)\n  }, [])\n\n  return <BrowserRou\n<<truncated 4 of 504 chars, sha256 b5c2131ce244>>"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 4,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/App.jsx",
-        "old_text": "<nav aria-label=\"Main navigation\">",
-        "new_text": "<nav ref={navigationRef} aria-label=\"Main navigation\">"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 5,
-      "tool": "read_file",
-      "input": {
-        "path": "backend/sql_alchemy.py"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 5,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/entities.js"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 5,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/App.jsx"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 5,
-      "tool": "run_command",
-      "input": {
-        "command": "npm run build",
-        "working_dir": "frontend",
-        "timeout": 120
-      },
-      "success": false,
-      "status": "error"
-    },
-    {
-      "turn": 5,
-      "tool": "run_command",
-      "input": {
-        "command": "python .besser_probe.py up && python .besser_probe.py routes && python .besser_probe.py req GET /health && python .besser_probe.py down",
-        "timeout": 120
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 5,
-      "tool": "validate_app",
-      "input": {},
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 6,
-      "tool": "install_dependencies",
-      "input": {
-        "working_dir": "frontend"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 6,
-      "tool": "test_api",
-      "input": {
-        "scenario_id": "existing-expense-income-transfer-create-read",
-        "requests": [
-          {
-            "method": "POST",
-            "path": "/account/",
-            "json": {
-              "currency": "EUR",
-              "name": "Checking",
-              "openingBalance": 1000,
-              "openingBalanceDate": "2026-11-01"
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "POST",
-            "path": "/account/",
-            "json": {
-              "currency": "USD",
-              "name": "Savings",
-              "openingBalance": 500,
-              "openingBalanceDate": "2026-11-01"
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "POST",
-            "path": "/expense/",
-            "json": {
-              "account": "{{0.account.id}}",
-              "description": "Rent",
-              "expenseType": "FIX",
-              "amount": 200,
-              "startDate": "2026-11-01",
-              "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "GET",
-            "path": "/expense/{{2.id}}/",
-            "expected_status": 200,
-            "expected_fields": {
-              "expense.description": "Rent"
-            }
-          },
-          {
-            "method": "POST",
-            "path": "/income/",
-            "json": {
-              "account": "{{0.account.id}}",
-              "description": "Salary",
-              "incomeType": "VARIABLE",
-              "expectedValue": 1000,
-              "allowedDeviation": 100,
-              "startDate": "2026-11-01",
-              "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "GET",
-            "path": "/income/{{4.id}}/",
-            "expected_status": 200,
-            "expected_fields": {
-              "income.description": "Salary"
-            }
-          },
-          {
-            "method": "POST",
-            "path": "/transfer/",
-            "json": {
-              "fromAccount": "{{0.account.id}}",
-              "toAccount": "{{1.account.id}}",
-              "amount": 50,
-              "date": "2026-11-01",
-              "description": "Savings transfer",
-              "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "GET",
-            "path": "/transfer/{{6.id}}/",
-            "expected_status": 200,
-            "expected_fields": {
-              "description": "Savings transfer",
-              "recurrenceIntervalMonths": 1
-            }
-          }
-        ]
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 7,
-      "tool": "run_command",
-      "input": {
-        "command": "npm run build",
-        "working_dir": "frontend",
-        "timeout": 120
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 7,
-      "tool": "test_api",
-      "input": {
-        "scenario_id": "existing-expense-income-transfer-create-read",
-        "correction_reason": "A transfer between different currency accounts is rightly refused; use two EUR accounts to test a valid transfer without weakening currency validation.",
-        "requests": [
-          {
-            "method": "POST",
-            "path": "/account/",
-            "json": {
-              "currency": "EUR",
-              "name": "Checking",
-              "openingBalance": 1000,
-              "openingBalanceDate": "2026-11-01"
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "POST",
-            "path": "/account/",
-            "json": {
-              "currency": "EUR",
-              "name": "Savings",
-              "openingBalance": 500,
-              "openingBalanceDate": "2026-11-01"
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "POST",
-            "path": "/expense/",
-            "json": {
-              "account": "{{0.account.id}}",
-              "description": "Rent",
-              "expenseType": "FIX",
-              "amount": 200,
-              "startDate": "2026-11-01",
-              "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "GET",
-            "path": "/expense/{{2.id}}/",
-            "expected_status": 200,
-            "expected_fields": {
-              "expense.description": "Rent"
-            }
-          },
-          {
-            "method": "POST",
-            "path": "/income/",
-            "json": {
-              "account": "{{0.account.id}}",
-              "description": "Salary",
-              "incomeType": "VARIABLE",
-              "expectedValue": 1000,
-              "allowedDeviation": 100,
-              "startDate": "2026-11-01",
-              "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "GET",
-            "path": "/income/{{4.id}}/",
-            "expected_status": 200,
-            "expected_fields": {
-              "income.description": "Salary"
-            }
-          },
-          {
-            "method": "POST",
-            "path": "/transfer/",
-            "json": {
-              "fromAccount": "{{0.account.id}}",
-              "toAccount": "{{1.account.id}}",
-              "amount": 50,
-              "date": "2026-11-01",
-              "description": "Savings transfer",
-              "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "GET",
-            "path": "/transfer/{{6.id}}/",
-            "expected_status": 200,
-            "expected_fields": {
-              "description": "Savings transfer",
-              "recurrenceIntervalMonths": 1
-            }
-          }
-        ]
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 7,
-      "tool": "task_list",
-      "input": {
-        "action": "done",
-        "id": 13,
-        "evidence": [
-          {
-            "id": 13,
-            "path": "frontend/src/App.jsx",
-            "quote": "document.addEventListener('pointerdown', closeOnOutsideClick)\n    return () => document.removeEventListener('pointerdown', closeOnOutsideClick)"
-          }
-        ]
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 8,
-      "tool": "test_api",
-      "input": {
-        "scenario_id": "existing-expense-income-transfer-create-read",
-        "correction_reason": "The transfer GET response wraps the record in a transfer key; correct only the assertion path.",
-        "requests": [
-          {
-            "method": "POST",
-            "path": "/account/",
-            "json": {
-              "currency": "EUR",
-              "name": "Checking",
-              "openingBalance": 1000,
-              "openingBalanceDate": "2026-11-01"
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "POST",
-            "path": "/account/",
-            "json": {
-              "currency": "EUR",
-              "name": "Savings",
-              "openingBalance": 500,
-              "openingBalanceDate": "2026-11-01"
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "POST",
-            "path": "/expense/",
-            "json": {
-              "account": "{{0.account.id}}",
-              "description": "Rent",
-              "expenseType": "FIX",
-              "amount": 200,
-              "startDate": "2026-11-01",
-              "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "GET",
-            "path": "/expense/{{2.id}}/",
-            "expected_status": 200,
-            "expected_fields": {
-              "expense.description": "Rent"
-            }
-          },
-          {
-            "method": "POST",
-            "path": "/income/",
-            "json": {
-              "account": "{{0.account.id}}",
-              "description": "Salary",
-              "incomeType": "VARIABLE",
-              "expectedValue": 1000,
-              "allowedDeviation": 100,
-              "startDate": "2026-11-01",
-              "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "GET",
-            "path": "/income/{{4.id}}/",
-            "expected_status": 200,
-            "expected_fields": {
-              "income.description": "Salary"
-            }
-          },
-          {
-            "method": "POST",
-            "path": "/transfer/",
-            "json": {
-              "fromAccount": "{{0.account.id}}",
-              "toAccount": "{{1.account.id}}",
-              "amount": 50,
-              "date": "2026-11-01",
-              "description": "Savings transfer",
-              "recurrenceIntervalMonths": 1
-            },
-            "expected_status": 200
-          },
-          {
-            "method": "GET",
-            "path": "/transfer/{{6.id}}/",
-            "expected_status": 200,
-            "expected_fields": {
-              "transfer.description": "Savings transfer",
-              "transfer.recurrenceIntervalMonths": 1
-            }
-          }
-        ]
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 9,
-      "tool": "task_list",
-      "input": {
-        "action": "mixed",
-        "done_ids": [
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12
-        ],
-        "existing": true,
-        "evidence": [
-          {
-            "id": 1,
-            "path": "frontend/src/entities.js",
-            "quote": "{ name: 'kind', label: 'For entries', type: 'enum', options: ['income', 'expense'], required: true }"
-          },
-          {
-            "id": 2,
-            "path": "backend/sql_alchemy.py",
-            "quote": "incomeType: Mapped_[str] = mapped_column(String_(20), default='EXTRAORDINARY', nullable=False)\n    expectedValue: Mapped_[Optional_[float]] = mapped_column(Float_, nullable=True)\n    allowedDeviation: Mapped_[Optional_[float]] = mapped_column(Float_, nullable=True)"
-          },
-          {
-            "id": 3,
-            "path": "frontend/src/entities.js",
-            "quote": "{ name: 'expenseType', label: 'Expense type', type: 'enum', options: ['FIX', 'VARIABLE', 'EXTRAORDINARY'], required: true }"
-          },
-          {
-            "id": 4,
-            "path": "frontend/src/entities.js",
-            "quote": "{ name: 'recurrenceIntervalMonths', label: 'Repeat every (months)', type: 'number', step: '1', min: '1' }"
-          },
-          {
-            "id": 5,
-            "path": "frontend/src/style.css",
-            "quote": ".needs-actual td{background:#fef3c7;color:#713f12}"
-          },
-          {
-            "id": 6,
-            "path": "frontend/src/App.jsx",
-            "quote": "<Route path=\"/\" element={<Dashboard />}/>"
-          },
-          {
-            "id": 7,
-            "path": "frontend/src/App.jsx",
-            "quote": "import Dashboard from './pages/Dashboard.jsx'"
-          },
-          {
-            "id": 8,
-            "path": "frontend/src/style.css",
-            "quote": ".balance-positive,.balance-positive strong{color:#087d6d;background:#eaf9f4}.balance-negative,.balance-negative strong{color:#be4054;background:#fff0f2}"
-          },
-          {
-            "id": 9,
-            "path": "frontend/src/entities.js",
-            "quote": "{ name: 'currency', label: 'Currency code', type: 'enum', options: ['EUR', 'BRL', 'USD'], required: true }"
-          },
-          {
-            "id": 10,
-            "path": "backend/sql_alchemy.py",
-            "quote": "class Transfer(Base):\n    __tablename__ = \"transfer\""
-          },
-          {
-            "id": 11,
-            "path": "frontend/src/App.jsx",
-            "quote": "<details className=\"nav-menu\"><summary>Accounts \u25be</summary>"
-          },
-          {
-            "id": 12,
-            "path": "frontend/src/style.css",
-            "quote": ".inline-category{display:flex;gap:8px;align-items:center}"
-          }
-        ]
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 10,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 10,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/pages/Dashboard.jsx"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 11,
-      "tool": "task_list",
-      "input": {
-        "action": "done",
-        "ids": [
-          5,
-          8,
-          12
-        ],
-        "existing": true,
-        "evidence": [
-          {
-            "id": 5,
-            "path": "frontend/src/pages/EntityList.jsx",
-            "quote": "{Array.from({ length: 11 }, (_, index) => <option key={2026 + index} value={2026 + index}>{2026 + index}</option>)}"
-          },
-          {
-            "id": 8,
-            "path": "frontend/src/pages/Dashboard.jsx",
-            "quote": "<option value=\"account\">Individual accounts</option><option value=\"group\">Groups</option><option value=\"total\">Total</option>"
-          },
-          {
-            "id": 12,
-            "path": "frontend/src/pages/EntityList.jsx",
-            "quote": "const result = await save('category', { name: newCategory.trim(), kind: categoryKind })"
-          }
-        ]
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 13,
-      "tool": "read_file",
-      "input": {
-        "path": "backend/pydantic_classes.py"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 13,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/pages/Dashboard.jsx"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 13,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/entities.js"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 13,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 13,
-      "tool": "task_list",
-      "input": {
-        "action": "list"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 14,
       "tool": "read_file",
       "input": {
         "path": "backend/monthly.py"
@@ -2417,242 +2187,25 @@
       "status": "ok"
     },
     {
-      "turn": 14,
+      "turn": 1,
       "tool": "read_file",
       "input": {
-        "path": "frontend/package.json"
+        "path": "backend/cashflow.py"
       },
       "success": true,
       "status": "ok"
     },
     {
-      "turn": 14,
+      "turn": 1,
       "tool": "read_file",
       "input": {
-        "path": "frontend/src/App.jsx"
+        "path": "frontend/src/pages/Dashboard.jsx"
       },
       "success": true,
       "status": "ok"
     },
     {
-      "turn": 14,
-      "tool": "read_file",
-      "input": {
-        "path": "backend/routers/revenue.py"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 15,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/entities.js",
-        "old_text": "{ name: 'expectedValue', label: 'Average amount', type: 'number', min: '0.01', conditional: 'VARIABLE', required: true },\n     { name: 'allowedDeviation', label: 'Deviation (\u00b1)', type: 'number', min: '0', conditional: 'VARIABLE', required: true },",
-        "new_text": "{ name: 'expectedValue', label: 'Average amount', type: 'number', min: '0.01', incomeRecurring: true, required: true },\n     { name: 'allowedDeviation', label: 'Deviation (\u00b1)', type: 'number', min: '0', incomeRecurring: true, required: true },"
-      },
-      "success": false,
-      "status": "error"
-    },
-    {
-      "turn": 15,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "if (field.conditional && row.expenseType !== field.conditional) return '\u2014'",
-        "new_text": "if ((field.conditional && row.expenseType !== field.conditional) || (field.incomeRecurring && !['FIXED', 'VARIABLE'].includes(row.incomeType))) return '\u2014'"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 15,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/pages/Dashboard.jsx",
-        "old_text": "['This month revenue', summary.months[0].income],",
-        "new_text": "['This month income', summary.months[0].income],"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 15,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "const displayedFields = config.fields.filter(field => !field.conditional || values.expenseType === field.conditional).map(field => ({ ...field,",
-        "new_text": "const displayedFields = config.fields.filter(field => (!field.conditional || values.expenseType === field.conditional) && (!field.incomeRecurring || ['FIXED', 'VARIABLE'].includes(values.incomeType))).map(field => ({ ...field,"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 15,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "label: field.name === 'amount' && entity === 'expense' && values.expenseType === 'VARIABLE' ? 'This months amount' : field.label,\n     required: field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(values.expenseType || values.incomeType)) || (field.name === 'amount' && entity === 'expense' && values.expenseType !== 'VARIABLE')",
-        "new_text": "label: field.name === 'amount' && (entity === 'expense' && values.expenseType === 'VARIABLE' || entity === 'income' && ['FIXED', 'VARIABLE'].includes(values.incomeType)) ? 'This months amount' : field.label,\n     required: field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(values.expenseType || values.incomeType)) || (field.name === 'amount' && entity === 'expense' && values.expenseType !== 'VARIABLE') || (field.name === 'amount' && entity === '\n<<truncated 49 of 549 chars, sha256 dde121f3cea9>>"
-      },
-      "success": false,
-      "status": "error"
-    },
-    {
-      "turn": 15,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/pages/Dashboard.jsx",
-        "old_text": "['Average monthly revenue', summary.months.reduce((sum, row) => sum + row.income, 0) / summary.months.length],",
-        "new_text": "['Average monthly income', summary.months.reduce((sum, row) => sum + row.income, 0) / summary.months.length],"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 16,
-      "tool": "replace_file_lines",
-      "input": {
-        "path": "frontend/src/entities.js",
-        "read_id": "1b9cb40a7b42:17",
-        "start_line": 37,
-        "end_line": 38,
-        "new_text": "    { name: 'expectedValue', label: 'Average amount', type: 'number', min: '0.01', incomeRecurring: true, required: true },\n    { name: 'allowedDeviation', label: 'Deviation (\u00b1)', type: 'number', min: '0', incomeRecurring: true, required: true },"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 17,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "label: field.name === 'amount' && entity === 'expense' && values.expenseType === 'VARIABLE' ? 'This months amount' : field.label,",
-        "new_text": "label: field.name === 'amount' && ((entity === 'expense' && values.expenseType === 'VARIABLE') || (entity === 'income' && values.incomeType === 'VARIABLE')) ? 'This months amount' : field.label,"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 17,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/entities.js",
-        "old_text": "return Object.fromEntries(entities[entity].fields.filter(field => !field.conditional || (values.expenseType || values.incomeType) === field.conditional).map(field => {",
-        "new_text": "return Object.fromEntries(entities[entity].fields.filter(field => (!field.conditional || values.expenseType === field.conditional) && (!field.incomeRecurring || ['FIXED', 'VARIABLE'].includes(values.incomeType))).map(field => {"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 18,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "if ((field.conditional && row.expenseType !== field.conditional) || (field.incomeRecurring && !['FIXED', 'VARIABLE'].includes(row.incomeType))) return '\u2014'",
-        "new_text": "if ((field.conditional && row.expenseType !== field.conditional) || (field.incomeRecurring && !['FIXED', 'VARIABLE'].includes(row.incomeType))) return '\u2014'"
-      },
-      "success": false,
-      "status": "error"
-    },
-    {
-      "turn": 19,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "required: field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(values.expenseType || values.incomeType)) || (field.name === 'amount' && entity === 'expense' && values.expenseType !== 'VARIABLE') }))",
-        "new_text": "required: (field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(values.expenseType || values.incomeType)) || (field.name === 'amount' && entity === 'expense' && values.expenseType !== 'VARIABLE')) && !(field.name === 'amount' && entity === 'income' && values.incomeType === 'VARIABLE') }))"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 20,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "if ((field.conditional && row.expenseType !== field.conditional) || (field.incomeRecurring && !['FIXED', 'VARIABLE'].includes(row.incomeType))) return '\u2014'",
-        "new_text": "if ((field.conditional && row.expenseType !== field.conditional) || (field.incomeRecurring && !['FIXED', 'VARIABLE'].includes(row.incomeType))) return '\u2014'"
-      },
-      "success": false,
-      "status": "error"
-    },
-    {
-      "turn": 21,
-      "tool": "modify_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "if ((field.conditional && row.expenseType !== field.conditional) || (field.incomeRecurring && !['FIXED', 'VARIABLE'].includes(row.incomeType))) return '\u2014'",
-        "new_text": "if ((field.conditional && row.expenseType !== field.conditional) || (field.incomeRecurring && !['FIXED', 'VARIABLE'].includes(row.incomeType))) return '\u2014'"
-      },
-      "success": false,
-      "status": "error"
-    },
-    {
-      "turn": 22,
-      "tool": "run_command",
-      "input": {
-        "command": "npm run build",
-        "working_dir": "frontend",
-        "timeout": 120
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 22,
-      "tool": "validate_app",
-      "input": {},
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 23,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/pages/EntityList.jsx"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 23,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/App.jsx"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 23,
-      "tool": "read_file",
-      "input": {
-        "path": "frontend/src/entities.js"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 23,
-      "tool": "task_list",
-      "input": {
-        "action": "list"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 24,
-      "tool": "read_file",
-      "input": {
-        "path": "backend/pydantic_classes.py"
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 24,
+      "turn": 1,
       "tool": "read_file",
       "input": {
         "path": "frontend/src/style.css"
@@ -2661,91 +2214,672 @@
       "status": "ok"
     },
     {
-      "turn": 24,
+      "turn": 1,
       "tool": "read_file",
       "input": {
-        "path": "frontend/package.json"
+        "path": "frontend/src/api.js"
       },
       "success": true,
       "status": "ok"
     },
     {
-      "turn": 25,
+      "turn": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "frontend/src/entities.js"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 1,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/sql_alchemy.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 2,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/pydantic_classes.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 2,
+      "tool": "read_file",
+      "input": {
+        "path": "frontend/src/App.jsx"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 2,
+      "tool": "read_file",
+      "input": {
+        "path": "frontend/src/pages/EntityList.jsx"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 2,
+      "tool": "run_command",
+      "input": {
+        "timeout": 120
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 3,
       "tool": "modify_file",
       "input": {
-        "path": "frontend/src/entities.js",
-        "old_text": "    field.type === 'enum' ? field.options[0] : '']))",
-        "new_text": "    field.type === 'enum' && !['expenseType', 'incomeType'].includes(field.name) ? field.options[0] : '']))"
+        "path": "backend/main_api.py",
+        "old_text": "    return {'asOf': date.today().isoformat(), 'currencies': by_currency}\n"
       },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 4,
+      "tool": "validate_app",
+      "input": {},
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 5,
+      "tool": "modify_file",
+      "input": {
+        "path": "frontend/src/pages/Dashboard.jsx",
+        "old_text": "function CashflowTable({ title, months }) {"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 6,
+      "tool": "modify_file",
+      "input": {
+        "path": "frontend/src/pages/Dashboard.jsx",
+        "old_text": "      <div className=\"card\"><h3>Categories \u00b7 this month</h3>"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 7,
+      "tool": "modify_file",
+      "input": {
+        "path": "frontend/src/pages/Dashboard.jsx",
+        "old_text": "  const [selectedAccounts, setSelectedAccounts] = useState({})\n",
+        "new_text": ""
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 8,
+      "tool": "modify_file",
+      "input": {
+        "path": "frontend/src/pages/Dashboard.jsx"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 9,
+      "tool": "modify_file",
+      "input": {
+        "path": "frontend/src/style.css",
+        "old_text": ".dashboard-selector{max-width:280px;margin:8px 0 22px}"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 10,
+      "tool": "run_command",
+      "input": {
+        "working_dir": "frontend",
+        "timeout": 120
+      },
+      "success": false,
+      "status": "error"
+    },
+    {
+      "turn": 10,
+      "tool": "test_api",
+      "input": {
+        "scenario_id": "dashboard-valid-expense-income-transfer"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 10,
+      "tool": "validate_app",
+      "input": {},
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 11,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 12,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 13,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 14,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 15,
+      "tool": "test_api",
+      "input": {
+        "scenario_id": "dashboard-valid-expense-income-transfer"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 16,
+      "tool": "run_command",
+      "input": {
+        "timeout": 120
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 16,
+      "tool": "run_command",
+      "input": {
+        "command": "npm run build",
+        "working_dir": "frontend",
+        "timeout": 120
+      },
+      "success": false,
+      "status": "error"
+    },
+    {
+      "turn": 16,
+      "tool": "validate_app",
+      "input": {},
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 17,
+      "tool": "install_dependencies",
+      "input": {
+        "working_dir": "frontend"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 18,
+      "tool": "run_command",
+      "input": {
+        "command": "npm run build",
+        "working_dir": "frontend",
+        "timeout": 120
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 19,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py",
+        "old_text": "        actual = lambda row: row['amount'] if not row['needsActual'] else None\n"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 20,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 21,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": false,
+      "status": "error"
+    },
+    {
+      "turn": 22,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 23,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": false,
+      "status": "error"
+    },
+    {
+      "turn": 24,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": false,
+      "status": "error"
+    },
+    {
+      "turn": 25,
+      "tool": "validate_app",
+      "input": {},
       "success": true,
       "status": "ok"
     },
     {
       "turn": 26,
-      "tool": "modify_file",
+      "tool": "task_list",
       "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "  const displayedFields = config.fields.filter(field => (!field.conditional || values.expenseType === field.conditional) && (!field.incomeRecurring || ['FIXED', 'VARIABLE'].includes(values.incomeType))).map(field => ({ ...field,",
-        "new_text": "  const selectedType = entity === 'expense' ? values.expenseType : entity === 'income' ? values.incomeType : null\n  const displayedFields = config.fields.filter(field =>\n    ((entity !== 'expense' && entity !== 'income') || selectedType || !['amount', 'expectedValue', 'allowedDeviation', 'recurrenceIntervalMonths'].includes(field.name)) &&\n    (!field.conditional || values.expenseType === field.conditional) &&\n    (!field.incomeRecurring || ['FIXED', 'VARIABLE'].includes(values.incomeType))\n  ).\n<<truncated 25 of 525 chars, sha256 941c72196097>>"
+        "action": "mixed",
+        "existing": true
       },
       "success": true,
       "status": "ok"
     },
     {
       "turn": 27,
-      "tool": "modify_file",
+      "tool": "task_list",
       "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "        {field.type === 'reference' ? <><option value=\"\">Choose {field.label.toLowerCase()}</option>{(options[field.source] || []).filter(option => field.name !== 'category' || option.kind === (entity === 'entry' ? values.type_spec : entity)).map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</> : field.options.map(option => <option key={option} value={option}>{option === 'FIX' ? 'Fixed' : option === 'VARIABLE' ? 'Variable' : option === 'EXTRAORDINARY' ? 'Extraordin\n<<truncated 34 of 534 chars, sha256 e21e581eae17>>",
-        "new_text": "        {field.type === 'reference' ? <><option value=\"\">Choose {field.label.toLowerCase()}</option>{(options[field.source] || []).filter(option => field.name !== 'category' || option.kind === (entity === 'entry' ? values.type_spec : entity)).map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</> : <>{['expenseType', 'incomeType'].includes(field.name) && <option value=\"\" disabled>Choose {field.label.toLowerCase()}</option>}{field.options.map(option => <option key={op\n<<truncated 188 of 688 chars, sha256 ab773f749de4>>"
+        "action": "done"
       },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 28,
-      "tool": "run_command",
-      "input": {
-        "command": "npm run build",
-        "working_dir": "frontend",
-        "timeout": 120
-      },
-      "success": true,
-      "status": "ok"
-    },
-    {
-      "turn": 28,
-      "tool": "validate_app",
-      "input": {},
       "success": true,
       "status": "ok"
     },
     {
       "turn": 29,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/cashflow.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 29,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/monthly.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 29,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/routers/entry.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 29,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/sql_alchemy.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 29,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 29,
+      "tool": "read_file",
+      "input": {
+        "path": "frontend/src/pages/Dashboard.jsx"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 30,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/pydantic_classes.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 30,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/routers/revenue.py",
+        "offset": 95,
+        "limit": 145
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 30,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/routers/expense.py",
+        "offset": 95,
+        "limit": 145
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 30,
+      "tool": "test_api",
+      "input": {
+        "action": "get",
+        "scenario_id": "dashboard-valid-expense-income-transfer"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 30,
+      "tool": "task_list",
+      "input": {
+        "action": "list"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 31,
       "tool": "modify_file",
       "input": {
-        "path": "frontend/src/pages/EntityList.jsx",
-        "old_text": "    required: (field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(values.expenseType || values.incomeType)) || (field.name === 'amount' && entity === 'expense' && values.expenseType !== 'VARIABLE')) && !(field.name === 'amount' && entity === 'income' && values.incomeType === 'VARIABLE') }))",
-        "new_text": "    required: (field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(selectedType)) || (field.name === 'amount' && ((entity === 'expense' && values.expenseType !== 'VARIABLE') || (entity === 'income' && values.incomeType === 'EXTRAORDINARY')))) && !(field.name === 'amount' && selectedType === 'VARIABLE') }))"
+        "path": "backend/monthly.py"
       },
       "success": true,
       "status": "ok"
     },
     {
-      "turn": 30,
-      "tool": "run_command",
+      "turn": 32,
+      "tool": "modify_file",
       "input": {
-        "command": "npm run build",
-        "working_dir": "frontend",
-        "timeout": 120
+        "path": "backend/routers/revenue.py"
       },
       "success": true,
       "status": "ok"
     },
     {
-      "turn": 30,
-      "tool": "validate_app",
-      "input": {},
+      "turn": 33,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/routers/revenue.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 34,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/routers/revenue.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 35,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/cashflow.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 36,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/cashflow.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 37,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/cashflow.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 38,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/cashflow.py",
+        "old_text": "if (index == 0 and a.openingBalanceDate <= month_end(start))",
+        "new_text": "if (index == 0 and start <= a.openingBalanceDate <= month_end(start))"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 39,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/routers/category.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 39,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 39,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/routers/entry.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 39,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/routers/expense.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 39,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/routers/revenue.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 39,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/cashflow.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 39,
+      "tool": "read_file",
+      "input": {
+        "path": "backend/monthly.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 39,
+      "tool": "test_api",
+      "input": {
+        "action": "get",
+        "scenario_id": "dashboard-valid-expense-income-transfer"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 39,
+      "tool": "task_list",
+      "input": {
+        "action": "list"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 40,
+      "tool": "read_file",
+      "input": {
+        "path": "frontend/src/pages/Dashboard.jsx"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 41,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 42,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 43,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 44,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 45,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 46,
+      "tool": "modify_file",
+      "input": {
+        "path": "backend/main_api.py"
+      },
+      "success": true,
+      "status": "ok"
+    },
+    {
+      "turn": 47,
+      "tool": "modify_file",
+      "input": {
+        "path": "frontend/src/pages/Dashboard.jsx"
+      },
+      "success": false,
+      "status": "error"
+    },
+    {
+      "turn": 48,
+      "tool": "modify_file",
+      "input": {
+        "path": "frontend/src/pages/Dashboard.jsx"
+      },
       "success": true,
       "status": "ok"
     }
@@ -2760,11 +2894,19 @@
     "renamed": [],
     "changes": []
   },
+  "recipe_shortened": {
+    "bytes_before": 148070,
+    "budget_bytes": 131072,
+    "tool_call_inputs_cut": 37,
+    "api_bodies_cut": 0,
+    "tool_calls_dropped": 0,
+    "api_workflows_cut": 0
+  },
   "secret_findings": 0,
   "run": {
     "mode": "modify",
     "mode_reason": "edit of a previous result",
-    "base_run_id": "32ae6e97325547458cb3b2f0dd28fedc",
+    "base_run_id": "b2c8d9ca288b4c279113e553b32754dc",
     "target": "web_app",
     "target_decided_by": "not decided",
     "frontend_requested": true,
@@ -2782,207 +2924,207 @@
     "stop_message": null,
     "outcome": "completed",
     "warnings": [],
-    "duration_seconds": 195.0,
+    "duration_seconds": 338.3,
     "phase_seconds": {
-      "select": 11.2,
-      "plan": 6.1,
-      "customise": 45.6,
-      "validate": 132.0
+      "select": 14.1,
+      "plan": 9.0,
+      "customise": 125.2,
+      "validate": 189.9
     },
-    "estimated_cost_usd": 0.4018,
+    "estimated_cost_usd": 0.9239,
     "counts": {
-      "turns": 31,
-      "tool_calls": 62,
+      "turns": 48,
+      "tool_calls": 78,
       "files_written": 0,
-      "files_edited": 4,
+      "files_edited": 6,
       "blockers": 0
     },
     "besser_version": "8.10.1",
     "besser_build": "9deaedacf",
-    "request_chars": 5770
+    "request_chars": 10480
   },
   "verification": {
     "verified": [
       {
         "kind": "requirement",
         "id": "R1",
-        "what": "Categories should not be mandatory for income and expenses.",
-        "how": "implementation cited and re-checked against the delivered source: backend/pydantic_classes.py: category: Optional[int] = None # Categories are optional for entries.; Found in the source; API: a workflow passed but called no cited route",
+        "what": "Users can add income and fixed, variable, and extraordinary expenses.",
+        "how": "implementation cited and re-checked against the delivered source: backend/routers/revenue.py: async def create_income(income_data: IncomeCreate, database: Session = Depends(get_db)) -> Income: and backend/routers/expense.py: async def create_expense(expense_data: ExpenseCreate, database: Session = Depends(get_db)) -> \u2026[truncated]",
         "why": null
       },
       {
         "kind": "api_workflow",
-        "id": "existing-expense-income-transfer-create-read",
-        "what": "Test workflow 'existing-expense-income-transfer-create-read'",
-        "how": "8 request(s) run against the app: POST /account/, POST /account/, POST /expense/, GET /expense/{{2.id}}/, POST /income/, GET /income/{{4.id}}/, POST /transfer/, GET /transfer/{{6.id}}/",
+        "id": "dashboard-valid-expense-income-transfer",
+        "what": "Test workflow 'dashboard-valid-expense-income-transfer'",
+        "how": "9 request(s) run against the app: POST /account/, POST /account/, POST /expense/, GET /expense/{{2.id}}/, POST /income/, GET /income/{{4.id}}/, POST /transfer/, GET /transfer/{{6.id}}/, GET /dashboard/",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R2",
-        "what": "Users should be able to transfer money from one account to another.",
-        "how": "implementation cited and re-checked against the delivered source: backend/main_api.py: @app.post('/transfer/', tags=['Transfer']) and backend/main_api.py: record = Transfer(fromAccount_id=source.id, toAccount_id=destination.id, amount=transfer.amount, date=transfer.date, description=transfer.description,",
+        "what": "The app calculates monthly cashflow for the current and following months, indicating the money expected to remain in the account at each month end.",
+        "how": "implementation cited and re-checked against the delivered source: backend/cashflow.py: def project( and backend/cashflow.py: \"endBalance\": float(balance),; Found in the source; API: a workflow passed but called no cited route",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R3",
-        "what": "Remove the main \u201cFeel at home...\u201d card from the dashboard.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: <div className=\"page-heading\"><div><p className=\"eyebrow\">OVERVIEW</p><h2>Your spending outlook</h2></div></div>; Found in the source; screens: not run (the frontend builds)",
+        "what": "Users can manage multiple accounts in parallel and view cashflow for an individual account.",
+        "how": "implementation cited and re-checked against the delivered source: backend/routers/account.py: @router.get('/account/{account_id}/cashflow/', tags=['Account']) and \u2026[truncated]; Found in the source; API: a passing workflow called POST /account/, the cited route; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R4",
-        "what": "Remove \u201cFollowing months\u2019 spending\u201d from the dashboard.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: <div className=\"card\"><h3>Categories \u00b7 this month</h3><div className=\"pie-grid\"><CategoryPie title=\"Income\" items={summary.categories.income} \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
-        "why": null
-      },
-      {
-        "kind": "requirement",
-        "id": "R5",
-        "what": "The dashboard should include a widget with two pie charts showing income categories and expense categories.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: <div className=\"card\"><h3>Categories \u00b7 this month</h3><div className=\"pie-grid\"><CategoryPie title=\"Income\" items={summary.categories.income} \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
-        "why": null
-      },
-      {
-        "kind": "requirement",
-        "id": "R6",
-        "what": "Color the dashboard table based on whether the month\u2019s total and the overall total are positive or negative.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: return <tr key={row.month}><td>{row.month}</td><td>{row.income.toFixed(2)}</td><td>{row.spending.toFixed(2)}</td><td className={monthly >= 0 ? \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
-        "why": null
-      },
-      {
-        "kind": "requirement",
-        "id": "R7",
-        "what": "Let users choose which table to show on the dashboard: individual accounts, groups, or total.",
+        "what": "Users can choose which accounts to consolidate into a combined cashflow view.",
         "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: <label className=\"field dashboard-selector\"><span>Show cashflow table</span><select value={view} onChange={event => \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
+        "id": "R5",
+        "what": "Users can classify income and expenses using optional categories.",
+        "how": "implementation cited and re-checked against the delivered source: backend/pydantic_classes.py: category: Optional[int] = None # Categories are optional for entries. and backend/routers/revenue.py: if related_category.kind != 'income':",
+        "why": null
+      },
+      {
+        "kind": "requirement",
+        "id": "R6",
+        "what": "Users can transfer money between accounts.",
+        "how": "implementation cited and re-checked against the delivered source: backend/main_api.py: def create_transfer(transfer: TransferCreate, database: Session = Depends(get_db)): and backend/main_api.py: record = Transfer(fromAccount_id=source.id, toAccount_id=destination.id, and backend/main_api.py: database.add(record)",
+        "why": null
+      },
+      {
+        "kind": "requirement",
+        "id": "R7",
+        "what": "Transfers can be configured to repeat.",
+        "how": "implementation cited and re-checked against the delivered source: backend/pydantic_classes.py: recurrenceIntervalMonths: Optional[int] = None and backend/main_api.py: recurrenceIntervalMonths=transfer.recurrenceIntervalMonths, endDate=transfer.endDate)",
+        "why": null
+      },
+      {
+        "kind": "requirement",
         "id": "R8",
-        "what": "Name the app \u201cPockindle.\u201d",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/App.jsx: <BrowserRouter><div className=\"app-shell\"><header className=\"site-header\"><div className=\"header-inner\"><Link className=\"brand\" to=\"/\"><span \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
+        "what": "The dashboard does not show the \u201cFeel at home...\u201d card or the \u201cFollowing months\u2019 spending\u201d section.",
+        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: <div className=\"page-heading\"><div><p className=\"eyebrow\">OVERVIEW</p><h2>Your spending outlook</h2></div></div>; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R9",
-        "what": "Provide a currency-code list that includes EUR, BRL, and USD.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/entities.js: { name: 'currency', label: 'Currency code', type: 'enum', options: ['EUR', 'BRL', 'USD'], required: true },; Found in the source; screens: not run (the frontend builds)",
+        "what": "The dashboard includes two pie charts, one showing income categories and one showing expense categories.",
+        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: <div className=\"card\"><h3>Categories \u00b7 this month</h3><div className=\"pie-grid\"><CategoryPie title=\"Income\" items={summary.categories.income} \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R10",
-        "what": "Transfers should be repeatable.",
-        "how": "implementation cited and re-checked against the delivered source: backend/cashflow.py: \"\"\"Project a transfer on its date and, optionally, every interval months.\"\"\" and backend/main_api.py: recurrenceIntervalMonths=transfer.recurrenceIntervalMonths, endDate=transfer.endDate)",
+        "what": "Dashboard table coloring reflects whether the month\u2019s total is positive or negative, including the overall total.",
+        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: return <tr key={row.month}><td>{row.month}</td><td>{row.income.toFixed(2)}</td><td>{row.spending.toFixed(2)}</td><td className={monthly >= 0 ? \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R11",
-        "what": "Allow users to add a new category directly from the page where they choose an income or expense category.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/EntityList.jsx: async function createCategory() { and frontend/src/pages/EntityList.jsx: const result = await save('category', { name: newCategory.trim(), kind: \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
+        "what": "Users can choose whether the dashboard table shows individual accounts, groups, or the total.",
+        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: <label className=\"field dashboard-selector\"><span>Show cashflow table</span><select value={view} onChange={event => \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R12",
-        "what": "Income and expenses should have separate categories.",
-        "how": "implementation cited and re-checked against the delivered source: backend/routers/revenue.py: if related_category.kind != 'income': and backend/routers/expense.py: if related_category.kind != 'expense': and backend/sql_alchemy.py: kind: Mapped_[str] = mapped_column(String_(10), nullable=False)",
+        "what": "The app is named \u201cPockindle\u201d.",
+        "how": "implementation cited and re-checked against the delivered source: backend/main_api.py: title='Pockindle API', and frontend/src/App.jsx: return <BrowserRouter><div \u2026[truncated]; Found in the source; API: a passing workflow called GET /dashboard/, a route of the cited file; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R13",
-        "what": "The menu should include Overview; Accounts with Individual Accounts and Groups; and Entries with All entries, Income, Expenses, Transfers, and Categories.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/App.jsx: <BrowserRouter><div className=\"app-shell\"><header className=\"site-header\"><div className=\"header-inner\"><Link className=\"brand\" to=\"/\"><span \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
+        "what": "Currency code is selected from a list that includes EUR, BRL, and USD.",
+        "how": "implementation cited and re-checked against the delivered source: frontend/src/entities.js: { name: 'currency', label: 'Currency code', type: 'enum', options: ['EUR', 'BRL', 'USD'], required: true },; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R14",
-        "what": "Show dashboard cards in this order: This month income, This month expenses, This month total, Average monthly income, Average monthly expenses, Average monthly total.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: ['This month income', summary.months[0].income], and frontend/src/pages/Dashboard.jsx: ['This month expenses', summary.months[0].spending], and \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
+        "what": "Users can add new income or expense categories directly from the category-selection page.",
+        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/EntityList.jsx: async function createCategory() { and frontend/src/pages/EntityList.jsx: <button type=\"button\" className=\"button\" disabled={addingCategory || \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R15",
-        "what": "Use \u201cIncome\u201d instead of \u201cRevenue.\u201d",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: ['This month income', summary.months[0].income], and frontend/src/App.jsx: <BrowserRouter><div className=\"app-shell\"><header \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
+        "what": "Income categories and expense categories are separate.",
+        "how": "implementation cited and re-checked against the delivered source: backend/sql_alchemy.py: kind: Mapped_[str] = mapped_column(String_(10), nullable=False) and backend/routers/expense.py: if related_category.kind != 'expense':",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R16",
-        "what": "Fixed and variable expenses must have a repeat interval in months, and the interval cannot be 0.",
-        "how": "implementation cited and re-checked against the delivered source: backend/pydantic_classes.py: def positive_interval(cls, value): and backend/pydantic_classes.py: if value is not None and value < 1: and backend/pydantic_classes.py: \u2026[truncated]; Found in the source; API: a workflow passed but called no cited route",
+        "what": "The menu contains Overview; Accounts with Individual Accounts and Groups; and Entries with All entries, Income, Expenses, Transfers, and Categories.",
+        "how": "implementation cited and re-checked against the delivered source: frontend/src/App.jsx: <Routes><Route path=\"/\" element={<Dashboard />}/><Route path=\"/transfer\" element={<Transfers />}/>{Object.keys(entities).map(key => <React.Fragment \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R17",
-        "what": "For a variable expense, let the user enter an expected value and a permitted deviation from that value.",
-        "how": "implementation cited and re-checked against the delivered source: backend/pydantic_classes.py: if self.expectedValue is None or self.allowedDeviation is None: and backend/pydantic_classes.py: raise ValueError('Variable expenses require \u2026[truncated]; Found in the source; API: a workflow passed but called no cited route",
+        "what": "Dashboard cards appear in this order: This month revenue, This month expenses, This month total, Average monthly revenue, average monthly expenses, average monthly total.",
+        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/Dashboard.jsx: ['This month income', summary.months[0].income], and frontend/src/pages/Dashboard.jsx: ['This month expenses', summary.months[0].spending], and \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R18",
-        "what": "Show expenses in a monthly view, ordered with fixed expenses first, variable expenses second, and extraordinary expenses third.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/EntityList.jsx: {monthlyEntity && <section className=\"card\"><div className=\"month-heading\"><h2>Monthly \u2026[truncated]; Found in the source; API: a workflow passed but called no cited route; screens: not run (the frontend builds)",
+        "what": "Replace the term \u201cRevenue\u201d with \u201cIncome\u201d throughout the app.",
+        "how": "implementation cited and re-checked against the delivered source: frontend/src/App.jsx: return <BrowserRouter><div className=\"app-shell\"><header className=\"site-header\"><div className=\"header-inner\"><Link className=\"brand\" to=\"/\"><span \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R19",
-        "what": "Bring fixed and variable expenses into a new month when they are considered for that month.",
-        "how": "implementation cited and re-checked against the delivered source: backend/cashflow.py: for entry in entries: and backend/cashflow.py: interval = entry.recurrenceIntervalMonths; Found in the source; API: a workflow passed but called no cited route",
+        "what": "Fixed and variable expenses require a repeat interval in months, and the interval cannot be zero.",
+        "how": "implementation cited and re-checked against the delivered source: backend/pydantic_classes.py: if self.expenseType in (ExpenseType.FIX, ExpenseType.VARIABLE) and self.recurrenceIntervalMonths is None: and backend/pydantic_classes.py: \u2026[truncated]; Found in the source; API: a workflow passed but called no cited route",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R20",
-        "what": "Highlight variable expenses in yellow in the monthly view to indicate that the user should manually update their value rather than use the expected value.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/EntityList.jsx: {monthlyError && <p className=\"error\" role=\"alert\">{monthlyError}</p>} and frontend/src/pages/EntityList.jsx: {monthly === null ? <p>Loading \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
+        "what": "For variable expenses, users enter an expected value and an allowed deviation value.",
+        "how": "implementation cited and re-checked against the delivered source: backend/pydantic_classes.py: if self.expectedValue is None or self.allowedDeviation is None: and backend/pydantic_classes.py: if not 0 < self.expectedValue < \u2026[truncated]; Found in the source; API: a workflow passed but called no cited route",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R21",
-        "what": "Income should be classified as fixed, variable, or extraordinary.",
-        "how": "implementation cited and re-checked against the delivered source: backend/pydantic_classes.py: class IncomeType(str, Enum): and backend/pydantic_classes.py: incomeType: IncomeType = IncomeType.EXTRAORDINARY; Found in the source; API: a workflow passed but called no cited route",
+        "what": "Expenses are shown in a monthly view, ordered fixed first, variable second, and extraordinary third.",
+        "how": "implementation cited and re-checked against the delivered source: backend/monthly.py: order = {'FIX': 0, 'FIXED': 0, 'VARIABLE': 1, 'EXTRAORDINARY': 2} and frontend/src/pages/EntityList.jsx: \u2026[truncated]; Found in the source; API: a workflow passed but called no cited route; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R22",
-        "what": "Show income in a monthly view, and allow its expected value to be changed.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/EntityList.jsx: {monthlyEntity && <section className=\"card\"><div className=\"month-heading\"><h2>Monthly \u2026[truncated]; Found in the source; API: a workflow passed but called no cited route; screens: not run (the frontend builds)",
+        "what": "Fixed and variable expenses are carried forward to each month in which they are considered applicable.",
+        "how": "implementation cited and re-checked against the delivered source: backend/cashflow.py: interval = entry.recurrenceIntervalMonths and backend/monthly.py: for day in occurrences(record, first, last):; Found in the source; API: a workflow passed but called no cited route",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R23",
-        "what": "Require the user to choose the expense type before entering its amount.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/entities.js: { name: 'expenseType', label: 'Expense type', type: 'enum', options: ['FIX', 'VARIABLE', 'EXTRAORDINARY'], required: true }, and \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
+        "what": "Variable expenses in the monthly view are highlighted yellow to indicate that the user should update the amount, rather than treating the expected value as the actual amount.",
+        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/EntityList.jsx: {monthly === null ? <p>Loading monthly entries\u2026</p> : !monthly.length ? <p className=\"muted\">No entries scheduled for this month.</p> : <div \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
         "why": null
       },
       {
         "kind": "requirement",
         "id": "R24",
-        "what": "For variable expenses, label the amount field \u201cThis months amount\u201d and make it optional.",
-        "how": "implementation cited and re-checked against the delivered source: frontend/src/pages/EntityList.jsx: label: field.name === 'amount' && ((entity === 'expense' && values.expenseType === 'VARIABLE') || (entity === 'income' && values.incomeType === \u2026[truncated]; Found in the source; screens: not run (the frontend builds)",
+        "what": "Income can be fixed, variable, or extraordinary.",
+        "how": "implementation cited and re-checked against the delivered source: backend/pydantic_classes.py: class IncomeType(str, Enum): and backend/pydantic_classes.py: incomeType: IncomeType = IncomeType.EXTRAORDINARY; Found in the source; API: a workflow passed but called no cited route",
         "why": null
       }
     ],
     "notVerified": [],
     "shippedUnenforced": [],
     "counts": {
-      "verified": 30,
+      "verified": 50,
       "notVerified": 0,
       "shippedUnenforced": 0
     }

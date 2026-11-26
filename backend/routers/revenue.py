@@ -127,12 +127,8 @@ async def create_income(income_data: IncomeCreate, database: Session = Depends(g
 
     database.add(db_income)
     database.flush()
-    database.refresh(db_income)
-
-
-
-
-
+    if income_data.incomeType == IncomeType.VARIABLE and income_data.amount is not None:
+        database.add(OccurrenceAmount(entry_id=db_income.id, date=db_income.startDate, amount=income_data.amount))
     database.commit()
     database.refresh(db_income)
     return db_income
@@ -158,6 +154,8 @@ async def bulk_create_income(items: list[IncomeCreate], database: Session = Depe
                 amount=item_data.amount if item_data.amount is not None else item_data.expectedValue,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                incomeType=item_data.incomeType.value,                expectedValue=item_data.expectedValue,                allowedDeviation=item_data.allowedDeviation,                account_id=item_data.account,                category_id=item_data.category            )
             database.add(db_income)
             database.flush()  # Get ID without committing
+            if item_data.incomeType == IncomeType.VARIABLE and item_data.amount is not None:
+                database.add(OccurrenceAmount(entry_id=db_income.id, date=db_income.startDate, amount=item_data.amount))
             created_items.append(db_income.id)
         except ValueError as e:
             errors.append({"index": idx, "error": str(e)})
@@ -226,6 +224,15 @@ async def update_income(income_id: int, income_data: IncomeCreate, database: Ses
         if field == 'category' and related_id is not None and database.get(Category, related_id).kind != 'income':
             raise HTTPException(status_code=422, detail='Income requires an income category')
         setattr(db_income, field + '_id', related_id)
+    if income_data.incomeType == IncomeType.VARIABLE:
+        initial = database.get(OccurrenceAmount, (income_id, income_data.startDate))
+        if income_data.amount is not None:
+            if initial is None:
+                database.add(OccurrenceAmount(entry_id=income_id, date=income_data.startDate, amount=income_data.amount))
+            else:
+                initial.amount = income_data.amount
+        elif initial is not None:
+            database.delete(initial)
     database.commit()
     database.refresh(db_income)
 

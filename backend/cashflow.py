@@ -83,21 +83,19 @@ def project(
     )
     overrides = {(item.entry_id, item.date): item.amount for item in database.query(OccurrenceAmount).filter(OccurrenceAmount.entry_id.in_([entry.id for entry in entries])).all()} if entries else {}
     buckets = [dict(income=Decimal("0"), spending=Decimal("0")) for _ in range(months)]
+    balance = sum((Decimal(str(a.openingBalance)) for a in accounts if a.openingBalanceDate < first_month), Decimal('0'))
     for entry in entries:
         account = next(a for a in accounts if a.id == entry.account_id)
         for day in occurrences(entry, account.openingBalanceDate, last):
-            if day < first_month:
-                continue  # Previous activity is already represented by the opening balance.
             index = (day.year - today.year) * 12 + day.month - today.month
-            if 0 <= index < months:
-                key = "spending" if entry.type_spec == "expense" else "income"
-                expected = (entry.expectedValue if isinstance(entry, Expense)
-                            and entry.expenseType.value == "VARIABLE"
-                            and (day != entry.startDate or entry.amount is None)
-                            else entry.expectedValue if entry.type_spec == 'income' and
-                            (day != entry.startDate or entry.amount is None) and
-                            entry.expectedValue is not None else entry.amount)
-                buckets[index][key] += Decimal(str(overrides.get((entry.id, day), expected)))
+            key = "spending" if entry.type_spec == "expense" else "income"
+            expected = (entry.expectedValue if entry.expectedValue is not None and
+                        (day != entry.startDate or entry.amount is None) else entry.amount)
+            amount = Decimal(str(overrides.get((entry.id, day), expected)))
+            if day < first_month:
+                balance += amount * (-1 if key == 'spending' else 1)
+            elif 0 <= index < months:
+                buckets[index][key] += amount
     transfers = (
         database.query(Transfer).filter(
             (Transfer.fromAccount_id.in_(account_ids)) | (Transfer.toAccount_id.in_(account_ids))
@@ -106,17 +104,17 @@ def project(
     for transfer in transfers:
         # Transfers use the same monthly recurrence semantics as entries.
         for day in occurrences_at(transfer.date, transfer.recurrenceIntervalMonths,
-                                  transfer.endDate, first_month, last):
+                                  transfer.endDate, min((a.openingBalanceDate for a in accounts), default=first_month), last):
             index = (day.year - today.year) * 12 + day.month - today.month
-            if transfer.fromAccount_id in account_ids:
-                source = next(a for a in accounts if a.id == transfer.fromAccount_id)
-                if day >= source.openingBalanceDate:
-                    buckets[index]['spending'] += Decimal(str(transfer.amount))
-            if transfer.toAccount_id in account_ids:
-                destination = next(a for a in accounts if a.id == transfer.toAccount_id)
-                if day >= destination.openingBalanceDate:
-                    buckets[index]['income'] += Decimal(str(transfer.amount))
-    balance = Decimal("0")
+            for account_id, sign, key in ((transfer.fromAccount_id, -1, 'spending'), (transfer.toAccount_id, 1, 'income')):
+                if account_id in account_ids:
+                    account = next(a for a in accounts if a.id == account_id)
+                    if day >= account.openingBalanceDate:
+                        amount = Decimal(str(transfer.amount))
+                        if day < first_month:
+                            balance += sign * amount
+                        else:
+                            buckets[index][key] += amount
     result = []
     for index, bucket in enumerate(buckets):
         start = add_months(first_month, index)
@@ -125,7 +123,7 @@ def project(
             (
                 Decimal(str(a.openingBalance))
                 for a in accounts
-                if (index == 0 and a.openingBalanceDate <= month_end(start))
+                if (index == 0 and start <= a.openingBalanceDate <= month_end(start))
                 or (
                     index > 0
                     and a.openingBalanceDate.year == start.year
