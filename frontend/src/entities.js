@@ -24,12 +24,20 @@ export const entities = {
     { name: 'kind', label: 'For entries', type: 'enum', options: ['income', 'expense'], required: true }
   ] },
   entry: { label: 'All entries', singular: 'Entry', fields: entryFields, readOnlyCreate: true },
-  expense: { label: 'Expenses', singular: 'Expense', fields: [...entryFields,
+  expense: { label: 'Expenses', singular: 'Expense', fields: [
+    { name: 'description', label: 'Description', type: 'text', required: true },
     { name: 'expenseType', label: 'Expense type', type: 'enum', options: ['FIX', 'VARIABLE', 'EXTRAORDINARY'], required: true },
-    { name: 'expectedValue', label: 'Expected value', type: 'number', min: '0.01', conditional: 'VARIABLE' },
-    { name: 'allowedDeviation', label: 'Acceptable deviation (±)', type: 'number', min: '0', conditional: 'VARIABLE' }] },
-  income: { label: 'Income', singular: 'Income', fields: [...entryFields,
-    { name: 'incomeType', label: 'Income type', type: 'enum', options: ['FIXED', 'VARIABLE', 'EXTRAORDINARY'], required: true }] }
+    { name: 'expectedValue', label: 'Average amount', type: 'number', min: '0.01', conditional: 'VARIABLE', required: true },
+    { name: 'allowedDeviation', label: 'Acceptable deviation (±)', type: 'number', min: '0', conditional: 'VARIABLE', required: true },
+    { name: 'amount', label: 'Amount', type: 'number', min: '0.01' },
+    ...entryFields.filter(field => !['description', 'amount'].includes(field.name))] },
+  income: { label: 'Income', singular: 'Income', fields: [
+    { name: 'description', label: 'Description', type: 'text', required: true },
+    { name: 'incomeType', label: 'Income type', type: 'enum', options: ['FIXED', 'VARIABLE', 'EXTRAORDINARY'], required: true },
+    { name: 'expectedValue', label: 'Average amount', type: 'number', min: '0.01', required: true },
+    { name: 'allowedDeviation', label: 'Deviation (±)', type: 'number', min: '0', required: true },
+    { name: 'amount', label: 'This months amount', type: 'number', min: '0.01' },
+    ...entryFields.filter(field => !['description', 'amount'].includes(field.name))] }
 }
 export const today = () => new Date().toLocaleDateString('en-CA')
 export function initialValues(entity) {
@@ -40,8 +48,8 @@ export function initialValues(entity) {
 export function payload(entity, values) {
   return Object.fromEntries(entities[entity].fields.filter(field => !field.conditional || values.expenseType === field.conditional).map(field => {
     let value = values[field.name]
-    if (field.type === 'number') value = value === '' ? null : Number(value)
-    if (field.type === 'reference') value = value === '' ? null : Number(value)
+    if (field.type === 'number') value = value === '' || value == null ? null : Number(value)
+    if (field.type === 'reference') value = value === '' || value == null ? null : Number(value)
     if (field.type === 'multi') value = (value || []).map(Number)
     if (!field.required && value === '') value = null
     return [field.name, value]

@@ -28,18 +28,21 @@ def monthly_rows(database: Session, kind: str, month: str):
         for day in occurrences(record, first, last):
             overridden = (record.id, day) in overrides
             variable = isinstance(record, Expense) and record.expenseType.value == 'VARIABLE'
-            expected = record.expectedValue if variable else record.amount
-            amount = overrides.get((record.id, day), record.amount if day == record.startDate else expected)
+            expected = record.expectedValue if variable else (record.expectedValue if isinstance(record, Income) and record.expectedValue is not None else record.amount)
+            amount = overrides.get((record.id, day), record.amount if day == record.startDate and record.amount is not None else expected)
+            needs_actual = variable and not overridden and (day != record.startDate or record.amount is None)
+            if needs_actual:
+                amount = None
             result.append({
                 'id': record.id, 'date': day, 'description': record.description,
                 'account_id': record.account_id, 'category_id': record.category_id,
                 'kind': record.type_spec,
                 'type': record.expenseType.value if isinstance(record, Expense) else record.incomeType if isinstance(record, Income) else 'EXTRAORDINARY',
                 'amount': amount, 'expectedValue': expected,
-                'allowedDeviation': record.allowedDeviation if variable else None,
-                'expectedMinimum': expected - record.allowedDeviation if variable else None,
-                'expectedMaximum': expected + record.allowedDeviation if variable else None,
-                'needsActual': variable and day != record.startDate and not overridden,
+                'allowedDeviation': record.allowedDeviation if isinstance(record, (Expense, Income)) else None,
+                'expectedMinimum': expected - record.allowedDeviation if isinstance(record, (Expense, Income)) and record.allowedDeviation is not None else None,
+                'expectedMaximum': expected + record.allowedDeviation if isinstance(record, (Expense, Income)) and record.allowedDeviation is not None else None,
+                'needsActual': needs_actual,
                 'overridden': overridden,
             })
     order = {'FIX': 0, 'FIXED': 0, 'VARIABLE': 1, 'EXTRAORDINARY': 2}
@@ -73,11 +76,6 @@ def edit_occurrence(kind: str, entry_id: int, day: date, edit: AmountEdit, datab
         raise HTTPException(status_code=404, detail='Scheduled occurrence not found')
     if day < record.account.openingBalanceDate:
         raise HTTPException(status_code=422, detail='Occurrence precedes the account opening balance date')
-    if isinstance(record, Expense) and record.expenseType.value == 'VARIABLE':
-        minimum = record.expectedValue - record.allowedDeviation
-        maximum = record.expectedValue + record.allowedDeviation
-        if not minimum <= edit.amount <= maximum:
-            raise HTTPException(status_code=422, detail=f'Actual amount must be between {minimum:g} and {maximum:g}')
     override = database.get(OccurrenceAmount, (entry_id, day))
     if override is None:
         override = OccurrenceAmount(entry_id=entry_id, date=day, amount=edit.amount)

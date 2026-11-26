@@ -31,7 +31,12 @@ export default function Dashboard() {
   const [view, setView] = useState('total')
   const [selectedAccounts, setSelectedAccounts] = useState({})
   const [custom, setCustom] = useState({})
-  useEffect(() => { api('/dashboard/').then(setData).catch(e => setError(e.message)) }, [])
+  const [overages, setOverages] = useState(null)
+  const [overageError, setOverageError] = useState('')
+  useEffect(() => {
+    api('/dashboard/').then(setData).catch(e => setError(e.message))
+    api('/overview/overages/').then(setOverages).catch(e => setOverageError(e.message))
+  }, [])
   useEffect(() => {
     if (!data || view !== 'account') return
     const requests = Object.entries(data.currencies).map(async ([currency, summary]) => {
@@ -67,6 +72,11 @@ export default function Dashboard() {
       <label className="field dashboard-selector"><span>Show cashflow table</span><select value={view} onChange={event => setView(event.target.value)}><option value="account">Individual accounts</option><option value="group">Groups</option><option value="total">Total</option></select></label>
       {view === 'total' ? <CashflowTable title={`All accounts · ${currency}`} months={summary.months}/> : view === 'account' ? <><div className="account-filters" aria-label={`Choose ${currency} accounts`}>{summary.accounts.map(account => <label key={account.id}><input type="checkbox" checked={(selectedAccounts[currency] || summary.accounts.map(a => a.id)).includes(account.id)} onChange={event => { setCustom(current => ({ ...current, [currency]: null })); setSelectedAccounts(current => { const chosen = current[currency] || summary.accounts.map(a => a.id); return { ...current, [currency]: event.target.checked ? [...chosen, account.id] : chosen.filter(id => id !== account.id) } }) }}/>{account.name}</label>)}</div>{summary.accounts.filter(account => (selectedAccounts[currency] || summary.accounts.map(a => a.id)).includes(account.id)).map(account => <CashflowTable key={account.id} title={account.name} months={account.months}/>)}{(selectedAccounts[currency] || []).length > 0 && (selectedAccounts[currency] || []).length < summary.accounts.length && (custom[currency] ? <CashflowTable title={`Selected accounts · ${currency}`} months={custom[currency]}/> : <p>Loading selected cashflow…</p>)}</> : summary.groups.length ? summary.groups.map(group => <CashflowTable key={group.id} title={group.name} months={group.months}/>) : <div className="card empty">No groups in {currency} yet. <Link to="/accountgroup/new">Create a group →</Link></div>}
     </section>)}
+    <section className="card"><h3>Expenses above the stipulated monthly value</h3><p className="muted">Recorded expenses exceeding their average plus deviation.</p>
+      {overageError && <p className="error" role="alert">{overageError}</p>}
+      {!overages && !overageError && <p>Loading expense overages…</p>}
+      {overages && (overages.length ? <div className="table-scroll"><table><thead><tr><th>Date</th><th>Expense</th><th>Account</th><th>Actual</th><th>Average + deviation</th></tr></thead><tbody>{overages.map(row => <tr key={`${row.id}-${row.date}`}><td>{row.date}</td><td><Link to={`/expense/${row.id}/edit`}>{row.description}</Link></td><td>#{row.account_id}</td><td className="balance-negative">{row.amount.toFixed(2)}</td><td>{row.expectedValue.toFixed(2)} + {row.allowedDeviation.toFixed(2)} = {row.limit.toFixed(2)}</td></tr>)}</tbody></table></div> : <p className="muted">No recorded expenses above their stipulated value.</p>)}
+    </section>
     <p className="muted footnote">Projections use your opening balances and scheduled entries. Add accounts to a group to choose a consolidated cashflow view.</p>
   </main>
 }

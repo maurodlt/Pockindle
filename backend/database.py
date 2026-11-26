@@ -77,6 +77,10 @@ def init_db():
             income_columns = {col[1] for col in connection.exec_driver_sql('PRAGMA table_info(revenue)')}
             if 'incomeType' not in income_columns:
                 connection.exec_driver_sql("ALTER TABLE revenue ADD COLUMN \"incomeType\" VARCHAR(20) NOT NULL DEFAULT 'EXTRAORDINARY'")
+            if 'expectedValue' not in income_columns:
+                connection.exec_driver_sql('ALTER TABLE revenue ADD COLUMN "expectedValue" FLOAT')
+            if 'allowedDeviation' not in income_columns:
+                connection.exec_driver_sql('ALTER TABLE revenue ADD COLUMN "allowedDeviation" FLOAT')
             expense_columns = {col[1] for col in connection.exec_driver_sql('PRAGMA table_info(expense)')}
             if 'expectedValue' not in expense_columns:
                 connection.exec_driver_sql('ALTER TABLE expense ADD COLUMN "expectedValue" FLOAT')

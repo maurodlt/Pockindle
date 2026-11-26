@@ -123,7 +123,7 @@ async def create_expense(expense_data: ExpenseCreate, database: Session = Depend
             raise HTTPException(status_code=422, detail='Expense requires an expense category')
 
     db_expense = Expense(
-        amount=expense_data.amount,        description=expense_data.description,        endDate=expense_data.endDate,        recurrenceIntervalMonths=expense_data.recurrenceIntervalMonths,        startDate=expense_data.startDate,        expenseType=expense_data.expenseType.name,        expectedValue=expense_data.expectedValue,        allowedDeviation=expense_data.allowedDeviation,        account_id=expense_data.account,        category_id=expense_data.category        )
+        amount=expense_data.amount if expense_data.amount is not None else expense_data.expectedValue,        description=expense_data.description,        endDate=expense_data.endDate,        recurrenceIntervalMonths=expense_data.recurrenceIntervalMonths,        startDate=expense_data.startDate,        expenseType=expense_data.expenseType.name,        expectedValue=expense_data.expectedValue,        allowedDeviation=expense_data.allowedDeviation,        account_id=expense_data.account,        category_id=expense_data.category        )
 
     database.add(db_expense)
     database.flush()
@@ -155,7 +155,7 @@ async def bulk_create_expense(items: list[ExpenseCreate], database: Session = De
                 raise ValueError('Expense requires an expense category')
 
             db_expense = Expense(
-                amount=item_data.amount,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                expenseType=item_data.expenseType.name,                expectedValue=item_data.expectedValue,                allowedDeviation=item_data.allowedDeviation,                account_id=item_data.account,                category_id=item_data.category            )
+                amount=item_data.amount if item_data.amount is not None else item_data.expectedValue,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                expenseType=item_data.expenseType.name,                expectedValue=item_data.expectedValue,                allowedDeviation=item_data.allowedDeviation,                account_id=item_data.account,                category_id=item_data.category            )
             database.add(db_expense)
             database.flush()  # Get ID without committing
             created_items.append(db_expense.id)
@@ -211,7 +211,7 @@ async def update_expense(expense_id: int, expense_data: ExpenseCreate, database:
     if db_expense is None:
         raise HTTPException(status_code=404, detail="Expense not found")
 
-    setattr(db_expense, 'amount', expense_data.amount)
+    setattr(db_expense, 'amount', expense_data.amount if expense_data.amount is not None else expense_data.expectedValue)
     setattr(db_expense, 'description', expense_data.description)
     setattr(db_expense, 'endDate', expense_data.endDate)
     setattr(db_expense, 'recurrenceIntervalMonths', expense_data.recurrenceIntervalMonths)

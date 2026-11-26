@@ -93,7 +93,10 @@ def project(
                 key = "spending" if entry.type_spec == "expense" else "income"
                 expected = (entry.expectedValue if isinstance(entry, Expense)
                             and entry.expenseType.value == "VARIABLE"
-                            and day != entry.startDate else entry.amount)
+                            and (day != entry.startDate or entry.amount is None)
+                            else entry.expectedValue if entry.type_spec == 'income' and
+                            (day != entry.startDate or entry.amount is None) and
+                            entry.expectedValue is not None else entry.amount)
                 buckets[index][key] += Decimal(str(overrides.get((entry.id, day), expected)))
     transfers = (
         database.query(Transfer).filter(

@@ -243,6 +243,37 @@ def delete_transfer(transfer_id: int, database: Session = Depends(get_db)):
     return result
 
 
+@app.get('/overview/overages/', tags=['System'])
+def expense_overages(database: Session = Depends(get_db)):
+    """Historical actual expense occurrences above their average plus deviation."""
+    from decimal import Decimal
+    today = date.today()
+    overrides = {(row.entry_id, row.date): row.amount for row in database.query(OccurrenceAmount).all()}
+    result = []
+    for expense in database.query(Expense).all():
+        if expense.expectedValue is None or expense.allowedDeviation is None:
+            continue
+        first = max(expense.startDate, expense.account.openingBalanceDate)
+        last = min(today, expense.endDate or today)
+        if first > last:
+            continue
+        threshold = Decimal(str(expense.expectedValue)) + Decimal(str(expense.allowedDeviation))
+        for day in occurrences(expense, first, last):
+            # The first month's entered amount and explicit monthly edits are
+            # actuals; later unedited variable months are only estimates.
+            actual = overrides.get((expense.id, day))
+            if actual is None and day == expense.startDate and expense.amount != expense.expectedValue:
+                actual = expense.amount
+            if actual is None and expense.expenseType.value == 'FIX':
+                actual = expense.amount
+            if actual is not None and Decimal(str(actual)) > threshold:
+                result.append({'id': expense.id, 'date': day, 'description': expense.description,
+                               'account_id': expense.account_id, 'category_id': expense.category_id,
+                               'amount': actual, 'expectedValue': expense.expectedValue,
+                               'allowedDeviation': expense.allowedDeviation, 'limit': float(threshold)})
+    return sorted(result, key=lambda row: (row['date'], row['id']), reverse=True)
+
+
 @app.get('/dashboard/', tags=['System'])
 def dashboard(months: int = 6, database: Session = Depends(get_db)):
     if not 1 <= months <= 60:
@@ -286,7 +317,10 @@ def dashboard(months: int = 6, database: Session = Depends(get_db)):
             if count:
                 name = categories.get(entry.category_id, 'Uncategorized')
                 amounts = chart[entry.type_spec]
-                amounts[name] = amounts.get(name, Decimal('0')) + sum((Decimal(str(overrides.get((entry.id, day), entry.amount))) for day in occurrences(entry, max(first, account.openingBalanceDate), last)), Decimal('0'))
+                for day in occurrences(entry, max(first, account.openingBalanceDate), last):
+                    expected = getattr(entry, 'expectedValue', None)
+                    value = entry.amount if day == entry.startDate else (expected if expected is not None else entry.amount)
+                    amounts[name] = amounts.get(name, Decimal('0')) + Decimal(str(overrides.get((entry.id, day), value)))
         summary['categories'] = {
             kind: [{'name': name, 'amount': float(amount)} for name, amount in sorted(values.items())]
             for kind, values in chart.items()

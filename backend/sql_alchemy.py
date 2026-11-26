@@ -96,6 +96,8 @@ class Income(Entry):
     __tablename__ = "revenue"  # Keep existing records in place.
     id: Mapped_[int] = mapped_column(ForeignKey_("entry.id"), primary_key=True)
     incomeType: Mapped_[str] = mapped_column(String_(20), default='EXTRAORDINARY', nullable=False)
+    expectedValue: Mapped_[Optional_[float]] = mapped_column(Float_, nullable=True)
+    allowedDeviation: Mapped_[Optional_[float]] = mapped_column(Float_, nullable=True)
     __mapper_args__ = {
         "polymorphic_identity": "income",
     }
