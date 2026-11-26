@@ -275,7 +275,9 @@ def expense_overages(database: Session = Depends(get_db)):
 
 
 @app.get('/dashboard/', tags=['System'])
-def dashboard(months: int = 6, low_balance_threshold: float = 0, database: Session = Depends(get_db)):
+def dashboard(months: int = 6, low_balance_threshold: float = 0, reporting_currency: str = 'EUR',
+              brl_rate: float | None = None, usd_rate: float | None = None,
+              eur_rate: float | None = None, database: Session = Depends(get_db)):
     if low_balance_threshold < 0:
         raise HTTPException(status_code=422, detail='Low balance threshold must not be negative')
     if not 1 <= months <= 60:
@@ -387,6 +389,14 @@ def dashboard(months: int = 6, low_balance_threshold: float = 0, database: Sessi
                                   'expensesSpent': spent, 'expensesPlanned': expense_planned,
                                   'leftToSpend': expected_month_income - fixed - spent, 'fixedCosts': fixed,
                                   'monthlyIncomeExpected': expected_month_income}
+        summary['summaryCards'] = {
+            'thisMonthIncome': round(summary['months'][0]['income'], 2),
+            'thisMonthExpenses': round(summary['months'][0]['spending'], 2),
+            'thisMonthTotal': round(summary['months'][0]['income'] - summary['months'][0]['spending'], 2),
+            'averageMonthlyIncome': round(sum(month['income'] for month in summary['months']) / months, 2),
+            'averageMonthlyExpenses': round(sum(month['spending'] for month in summary['months']) / months, 2),
+            'averageMonthlyTotal': round(sum(month['income'] - month['spending'] for month in summary['months']) / months, 2),
+        }
         summary['missingAmounts'] = [{'id': row['id'], 'kind': row['kind'], 'description': row['description'], 'date': row['date']}
                                      for row in rows if row['needsActual'] and row['type'] == 'VARIABLE']
         timeline = []
@@ -475,11 +485,26 @@ def dashboard(months: int = 6, low_balance_threshold: float = 0, database: Sessi
         cost_history = [sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0
                             for row in past if row['account_id'] in ids and row['kind'] == 'expense'
                             and row['type'] in ('FIX', 'FIXED', 'VARIABLE')) for past in prior_rows]
-        observed_costs = [value for value in cost_history if value > 0]
-        current_costs = summary['spendingTypes']['fixed'] + summary['spendingTypes']['variable']
-        average_costs = sum(observed_costs) / len(observed_costs) if observed_costs else current_costs
+        average_costs = sum(cost_history) / len(cost_history)
         summary['emergencyCover'] = summary['todayBalance'] / average_costs if average_costs else None
-    return {'asOf': today.isoformat(), 'currencies': by_currency}
+    if reporting_currency not in ('EUR', 'BRL', 'USD'):
+        raise HTTPException(status_code=422, detail='Reporting currency must be EUR, BRL or USD')
+    provided = {'EUR': eur_rate, 'BRL': brl_rate, 'USD': usd_rate}
+    rates = {currency: 1.0 if currency == reporting_currency else provided[currency]
+             for currency in by_currency}
+    missing_rates = [currency for currency, rate in rates.items() if rate is None]
+    if any(rate is not None and not 0 < rate < float('inf') for rate in rates.values()):
+        raise HTTPException(status_code=422, detail='Conversion rates must be positive and finite')
+    net_worth = None if missing_rates else {
+        'currency': reporting_currency,
+        'todayBalance': round(sum(summary['todayBalance'] * rates[currency] for currency, summary in by_currency.items()), 2),
+        'changeSinceLastMonth': round(sum(summary['changeSinceLastMonth'] * rates[currency] for currency, summary in by_currency.items()), 2),
+        'balanceTrendDates': [add_months(today, -index).isoformat() for index in range(5, -1, -1)],
+        'balanceTrend': [round(sum(summary['balanceTrend'][index] * rates[currency]
+                                   for currency, summary in by_currency.items()), 2) for index in range(6)],
+    }
+    return {'asOf': today.isoformat(), 'currencies': by_currency, 'netWorth': net_worth,
+            'missingConversionRates': missing_rates}
 
 
 @app.get("/statistics", tags=["System"])
