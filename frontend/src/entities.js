@@ -34,8 +34,8 @@ export const entities = {
   income: { label: 'Income', singular: 'Income', fields: [
     { name: 'description', label: 'Description', type: 'text', required: true },
     { name: 'incomeType', label: 'Income type', type: 'enum', options: ['FIXED', 'VARIABLE', 'EXTRAORDINARY'], required: true },
-    { name: 'expectedValue', label: 'Average amount', type: 'number', min: '0.01', incomeRecurring: true, required: true },
-    { name: 'allowedDeviation', label: 'Deviation (±)', type: 'number', min: '0', incomeRecurring: true, required: true },
+    { name: 'expectedValue', label: 'Average amount', type: 'number', min: '0.01', required: true },
+    { name: 'allowedDeviation', label: 'Deviation (±)', type: 'number', min: '0', required: true },
     { name: 'amount', label: 'Amount', type: 'number', min: '0.01' },
     ...entryFields.filter(field => !['description', 'amount'].includes(field.name))] }
 }
@@ -46,7 +46,7 @@ export function initialValues(entity) {
     field.type === 'enum' && !['expenseType', 'incomeType'].includes(field.name) ? field.options[0] : '']))
 }
 export function payload(entity, values) {
-  return Object.fromEntries(entities[entity].fields.filter(field => (!field.conditional || values.expenseType === field.conditional) && (!field.incomeRecurring || ['FIXED', 'VARIABLE'].includes(values.incomeType))).map(field => {
+  return Object.fromEntries(entities[entity].fields.filter(field => (!field.conditional || values.expenseType === field.conditional) && (!field.incomeRecurring || ['FIXED', 'VARIABLE'].includes(values.incomeType)) && (!(entity === 'expense' || entity === 'income') || field.name !== 'recurrenceIntervalMonths' || ['FIX', 'FIXED', 'VARIABLE'].includes(entity === 'expense' ? values.expenseType : values.incomeType))).map(field => {
     let value = values[field.name]
     if (field.type === 'number') value = value === '' || value == null ? null : Number(value)
     if (field.type === 'reference') value = value === '' || value == null ? null : Number(value)

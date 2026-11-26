@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api, get, list, remove, save } from '../api.js'
+// Expense and income creation both use save(entity, ...), which POSTs to their respective endpoints.
 import { entities, initialValues, payload } from '../entities.js'
 
 export function Projection({ entity, id }) {
@@ -68,11 +69,11 @@ export function EntityList({ entity }) {
     return Array.isArray(value) ? value.join(', ') : value == null ? '—' : String(value)
   }
   return <main className="container"><div className="page-heading"><div><p className="eyebrow">YOUR FINANCES</p><h1>{config.label}</h1><p className="muted">Keep your financial picture up to date.</p></div>
-    {!config.readOnlyCreate && <Link className="button" to={`/${entity}/new`}>+ New {config.singular.toLowerCase()}</Link>}
+    {!config.readOnlyCreate && <Link className="button" to={`/${entity}/new`}>+ New {config.singular.toLowerCase()}</Link>}{entity === 'entry' && <span className="entry-create-links"><Link className="button" to="/income/new">+ New income</Link> <Link className="button" to="/expense/new">+ New expense</Link></span>}
   </div>
   {monthlyEntity && <section className="card"><div className="month-heading"><h2>Monthly entries</h2><div className="month-selectors"><label className="field">Month <select value={month} onChange={event => setMonth(Number(event.target.value))}>{Array.from({ length: 12 }, (_, index) => <option key={index + 1} value={index + 1}>{new Intl.DateTimeFormat('en', { month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, index, 1)))}</option>)}</select></label><label className="field">Year <select value={year} onChange={event => setYear(Number(event.target.value))}>{Array.from({ length: 11 }, (_, index) => <option key={2026 + index} value={2026 + index}>{2026 + index}</option>)}</select></label></div></div>
     {monthlyError && <p className="error" role="alert">{monthlyError}</p>}
-    {monthly === null ? <p>Loading monthly entries…</p> : !monthly.length ? <p className="muted">No entries scheduled for this month.</p> : <div className="table-scroll"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Expected / amount</th><th>Account</th><th>Monthly amount</th></tr></thead><tbody>{monthly.map(row => <tr key={`${row.id}-${row.date}`} className={row.needsActual ? 'needs-actual' : ''}>
+    {monthly === null ? <p>Loading monthly entries…</p> : !monthly.length ? <p className="muted">No entries scheduled for this month.</p> : <div className="table-scroll"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Expected / amount</th><th>Account</th><th>Monthly amount</th></tr></thead><tbody>{monthly.map(row => <tr key={`${row.id}-${row.date}`} className={row.type === 'VARIABLE' && row.needsActual ? 'needs-actual' : ''}>
       <td>{row.date}</td><td>{row.type === 'FIX' ? 'Fixed' : row.type === 'FIXED' ? 'Fixed' : row.type === 'VARIABLE' ? 'Variable' : 'Extraordinary'}</td><td>{row.description}</td>
       <td>{row.needsActual ? 'Actual amount pending' : row.amount == null ? '—' : row.amount.toFixed(2)}{row.kind === 'income' && row.expectedValue != null && <span className="actual-editor">{editingExpected === row.id ? <><input aria-label="Expected income amount" type="number" min="0.01" step="any" value={expectedAmount} onChange={event => setExpectedAmount(event.target.value)}/><button className="text-button" disabled={!Number.isFinite(Number(expectedAmount)) || Number(expectedAmount) <= 0} onClick={() => saveExpected(row)}>Save expected</button><button className="text-button" onClick={() => setEditingExpected(null)}>Cancel</button></> : <button className="text-button" onClick={() => { setEditingExpected(row.id); setExpectedAmount(String(row.expectedValue)) }}>Expected: {row.expectedValue.toFixed(2)} · Edit</button>}</span>}{row.expectedMinimum != null && <small className="range">Expected range: {row.expectedMinimum.toFixed(2)} – {row.expectedMaximum.toFixed(2)}</small>}{row.needsActual && <small className="range">Enter the actual amount manually</small>}</td><td>#{row.account_id}</td>
       <td>{editingAmount === `${row.id}-${row.date}` ? <span className="actual-editor"><input aria-label="Monthly amount" type="number" min="0.01" step="any" value={actual} onChange={event => setActual(event.target.value)}/><button className="text-button" disabled={!Number(actual) || Number(actual) <= 0} onClick={() => saveActual(row)}>Save</button><button className="text-button" onClick={() => setEditingAmount(null)}>Cancel</button></span> : !['income', 'expense'].includes(row.kind) ? '—' : <button className="text-button" onClick={() => { setEditingAmount(`${row.id}-${row.date}`); setActual(row.amount == null ? '' : String(row.amount)) }}>{row.kind === 'income' ? (row.overridden ? 'Change monthly income' : 'Set monthly income') : (row.overridden ? 'Change actual' : 'Set actual')}</button>}</td>
@@ -94,6 +95,7 @@ export function EntityForm({ entity }) {
   const navigate = useNavigate()
   const config = entities[entity]
   const [values, setValues] = useState(() => initialValues(entity))
+  const [typeConfirmed, setTypeConfirmed] = useState(false)
   const [options, setOptions] = useState({})
   const [loading, setLoading] = useState(Boolean(id))
   const [error, setError] = useState('')
@@ -103,11 +105,11 @@ export function EntityForm({ entity }) {
   const categoryKind = entity === 'entry' ? (values.type_spec || 'income') : entity
   const selectedType = entity === 'expense' ? values.expenseType : entity === 'income' ? values.incomeType : null
   const displayedFields = config.fields.filter(field =>
-    ((entity !== 'expense' && entity !== 'income') || selectedType || !['amount', 'expectedValue', 'allowedDeviation', 'recurrenceIntervalMonths'].includes(field.name)) &&
+    ((entity !== 'expense' && entity !== 'income') || typeConfirmed || !['amount', 'expectedValue', 'allowedDeviation', 'recurrenceIntervalMonths'].includes(field.name)) &&
     (!field.conditional || values.expenseType === field.conditional) &&
     (!field.incomeRecurring || ['FIXED', 'VARIABLE'].includes(values.incomeType))
-  ).map(field => ({ ...field,
-    label: field.name === 'amount' && ((entity === 'expense' && values.expenseType === 'VARIABLE') || (entity === 'income' && values.incomeType === 'VARIABLE')) ? 'This months amount' : field.label,
+  ).filter(field => field.name !== 'recurrenceIntervalMonths' || !['expense', 'income'].includes(entity) || ['FIX', 'FIXED', 'VARIABLE'].includes(selectedType)).map(field => ({ ...field,
+    label: field.name === 'amount' && ((entity === 'expense' && values.expenseType === 'VARIABLE') || (entity === 'income' && values.incomeType === 'VARIABLE')) ? "This month's amount" : field.label,
     required: (field.required || (field.name === 'recurrenceIntervalMonths' && ['FIX', 'FIXED', 'VARIABLE'].includes(selectedType)) || (field.name === 'amount' && ((entity === 'expense' && values.expenseType !== 'VARIABLE') || (entity === 'income' && values.incomeType === 'EXTRAORDINARY')))) && !(field.name === 'amount' && selectedType === 'VARIABLE') }))
   async function createCategory() {
     if (!newCategory.trim()) return
@@ -121,25 +123,36 @@ export function EntityForm({ entity }) {
     } catch (e) { setError(e.message) } finally { setAddingCategory(false) }
   }
   useEffect(() => {
-    setValues(initialValues(entity)); setError(''); setLoading(Boolean(id))
+    setValues(initialValues(entity)); setTypeConfirmed(false); setError(''); setLoading(Boolean(id))
     if (id) get(entity, id).then(result => {
       const record = result[entity] || result
       const linked = entity === 'accountgroup' ? { accounts: result.account_ids } : entity === 'account' ? { groups: result.accountgroup_ids } : {}
-      setValues({ ...initialValues(entity), ...record, ...linked, account: record.account_id, category: record.category_id }); setLoading(false)
+      setValues({ ...initialValues(entity), ...record, ...linked, account: record.account_id, category: record.category_id }); setTypeConfirmed(Boolean(record.expenseType || record.incomeType)); setLoading(false)
     }).catch(e => { setError(e.message); setLoading(false) })
     const sources = [...new Set(config.fields.filter(f => f.source).map(f => f.source))]
     Promise.all(sources.map(source => list(source).then(items => [source, items]))).then(pairs => setOptions(Object.fromEntries(pairs))).catch(e => setError(e.message))
   }, [entity, id])
   async function submit(event) {
-    event.preventDefault(); setBusy(true); setError('')
-    try { await save(entity, payload(entity, values), id); navigate(`/${entity}`) }
+    event.preventDefault()
+    if (['income', 'expense'].includes(entity) && !typeConfirmed) {
+      setError('Select the type before entering amounts.')
+      return
+    }
+    setBusy(true); setError('')
+    try {
+      // Keep the create endpoint explicit for expense and income entry forms.
+      if (!id && entity === 'expense') await api('/expense/', { method: 'POST', body: JSON.stringify(payload(entity, values)) })
+      else if (!id && entity === 'income') await api('/income/', { method: 'POST', body: JSON.stringify(payload(entity, values)) })
+      else await save(entity, payload(entity, values), id)
+      navigate(`/${entity}`)
+    }
     catch (e) { setError(e.message) } finally { setBusy(false) }
   }
   return <main className="container narrow"><Link className="back" to={`/${entity}`}>← {config.label}</Link><div className="page-heading"><div><p className="eyebrow">{id ? 'UPDATE' : 'CREATE'}</p><h1>{id ? `Edit ${config.singular.toLowerCase()}` : `New ${config.singular.toLowerCase()}`}</h1></div></div>
     {error && <p className="error" role="alert">{error}</p>}
     {loading ? <p>Loading {config.singular.toLowerCase()}…</p> : <form className="card form" onSubmit={submit}>{displayedFields.map(field => <label key={field.name} className="field"><span>{field.label}{field.required && ' *'}</span>
       {field.type === 'multi' ? <div className="checks">{(options[field.source] || []).length === 0 ? <span className="muted">Create an {field.source === 'account' ? 'account' : 'account group'} first.</span> : options[field.source].map(option => <label key={option.id}><input type="checkbox" checked={(values[field.name] || []).includes(option.id)} onChange={event => setValues(current => ({ ...current, [field.name]: event.target.checked ? [...(current[field.name] || []), option.id] : current[field.name].filter(value => value !== option.id) }))}/>{option.name}</label>)}</div>
-      : field.type === 'reference' || field.type === 'enum' ? <select value={values[field.name] ?? ''} required={field.required} onChange={event => setValues({ ...values, [field.name]: event.target.value })}>
+      : field.type === 'reference' || field.type === 'enum' ? <select value={values[field.name] ?? ''} required={field.required} onChange={event => { setValues({ ...values, [field.name]: event.target.value }); if (field.name === 'expenseType' || field.name === 'incomeType') setTypeConfirmed(Boolean(event.target.value)) }}>
         {field.type === 'reference' ? <><option value="">Choose {field.label.toLowerCase()}</option>{(options[field.source] || []).filter(option => field.name !== 'category' || option.kind === (entity === 'entry' ? values.type_spec : entity)).map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</> : <>{['expenseType', 'incomeType'].includes(field.name) && <option value="" disabled>Choose {field.label.toLowerCase()}</option>}{field.options.map(option => <option key={option} value={option}>{option === 'FIX' || option === 'FIXED' ? 'Fixed' : option === 'VARIABLE' ? 'Variable' : option === 'EXTRAORDINARY' ? 'Extraordinary' : option}</option>)}</>}</select>
       : <input type={field.type} value={values[field.name] ?? ''} required={field.required} min={field.min} step={field.type === 'number' ? field.step || 'any' : undefined} onChange={event => setValues({ ...values, [field.name]: event.target.value })}/>}
       {field.name === 'category' && (entity === 'income' || entity === 'expense') && <span className="inline-category"><input aria-label={`New ${entity} category name`} placeholder={`New ${entity} category`} value={newCategory} onChange={event => setNewCategory(event.target.value)} /><button type="button" className="button" disabled={addingCategory || !newCategory.trim()} onClick={createCategory}>{addingCategory ? 'Adding…' : 'Add category'}</button></span>}</label>)}

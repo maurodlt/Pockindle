@@ -385,18 +385,15 @@ def dashboard(months: int = 6, low_balance_threshold: float = 0, reporting_curre
         spent = sum(actual(row) or 0 for row in rows if row['kind'] == 'expense' and occurred(row))
         fixed = sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0 for row in scheduled if row['kind'] == 'expense' and row['type'] in ('FIX', 'FIXED'))
         expected_month_income = sum(row['expectedValue'] or 0 for row in scheduled if row['kind'] == 'income')
+        month_income = sum(row['amount'] if row['amount'] is not None else row['expectedValue'] or 0
+                           for row in scheduled if row['kind'] == 'income')
+        month_expenses = sum(row['amount'] if row['amount'] is not None else row['expectedValue'] or 0
+                             for row in scheduled if row['kind'] == 'expense')
         summary['monthToDate'] = {'incomeReceived': received, 'incomeExpected': income_expected,
                                   'expensesSpent': spent, 'expensesPlanned': expense_planned,
-                                  'leftToSpend': expected_month_income - fixed - spent, 'fixedCosts': fixed,
-                                  'monthlyIncomeExpected': expected_month_income}
-        summary['summaryCards'] = {
-            'thisMonthIncome': round(summary['months'][0]['income'], 2),
-            'thisMonthExpenses': round(summary['months'][0]['spending'], 2),
-            'thisMonthTotal': round(summary['months'][0]['income'] - summary['months'][0]['spending'], 2),
-            'averageMonthlyIncome': round(sum(month['income'] for month in summary['months']) / months, 2),
-            'averageMonthlyExpenses': round(sum(month['spending'] for month in summary['months']) / months, 2),
-            'averageMonthlyTotal': round(sum(month['income'] - month['spending'] for month in summary['months']) / months, 2),
-        }
+                                  'leftToSpend': round(month_income - month_expenses, 2),
+                                  'monthlyIncome': round(month_income, 2),
+                                  'fixedCosts': fixed, 'monthlyIncomeExpected': expected_month_income}
         summary['missingAmounts'] = [{'id': row['id'], 'kind': row['kind'], 'description': row['description'], 'date': row['date']}
                                      for row in rows if row['needsActual'] and row['type'] == 'VARIABLE']
         timeline = []
@@ -469,13 +466,15 @@ def dashboard(months: int = 6, low_balance_threshold: float = 0, reporting_curre
             if e.account_id not in ids or e.type_spec != 'expense' or e.recurrenceIntervalMonths not in (None, 12):
                 continue
             for day in occurrences(e, today, future):
-                amount = e.expectedValue or e.amount or 0
+                amount = overrides.get((e.id, day))
+                if amount is None:
+                    amount = e.amount if day == e.startDate and e.amount is not None else e.expectedValue if e.expectedValue is not None else e.amount or 0
                 upcoming.append({'description': e.description, 'date': day.isoformat(), 'amount': amount,
                                  'monthlySetAside': amount / max(1, (day.year - today.year) * 12 + day.month - today.month + 1)})
-        # Compare with a month's ordinary recurring costs, rather than an arbitrary
-        # number of items or an unrequested absolute currency threshold.
-        ordinary = sorted((row['yearly'] / 12 for row in summary['recurringCosts']
-                           if row['monthly'] > 0 and row['yearly'] / 12 > 0))
+        # Compare upcoming one-offs and yearly bills with ordinary monthly spending.
+        ordinary = sorted(row['amount'] if row['amount'] is not None else row['expectedValue'] or 0
+                          for row in scheduled if row['kind'] == 'expense'
+                          and row['type'] in ('FIX', 'FIXED', 'VARIABLE'))
         typical = ordinary[len(ordinary) // 2] if ordinary else 0
         summary['bigUpcoming'] = sorted((row for row in upcoming if row['amount'] > typical and row['amount'] > 0),
                                         key=lambda row: -row['amount'])[:5]
@@ -485,8 +484,16 @@ def dashboard(months: int = 6, low_balance_threshold: float = 0, reporting_curre
         cost_history = [sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0
                             for row in past if row['account_id'] in ids and row['kind'] == 'expense'
                             and row['type'] in ('FIX', 'FIXED', 'VARIABLE')) for past in prior_rows]
-        average_costs = sum(cost_history) / len(cost_history)
-        summary['emergencyCover'] = summary['todayBalance'] / average_costs if average_costs else None
+        # Use scheduled costs for the current and following months when history
+        # is not yet available (a newly created account has no past six months).
+        future_costs = [sum(row['expectedValue'] if row['expectedValue'] is not None else row['amount'] or 0
+                            for row in monthly_rows(database, 'expense', month['month'])
+                            if row['account_id'] in ids and row['type'] in ('FIX', 'FIXED', 'VARIABLE'))
+                        for month in summary['months']]
+        active_costs = cost_history if any(cost > 0 for cost in cost_history) else future_costs
+        average_costs = sum(active_costs) / len(active_costs) if active_costs else 0
+        # With no fixed or variable costs, show a numeric zero instead of a missing value.
+        summary['emergencyCover'] = round(summary['todayBalance'] / average_costs, 1) if average_costs else 0.0
     if reporting_currency not in ('EUR', 'BRL', 'USD'):
         raise HTTPException(status_code=422, detail='Reporting currency must be EUR, BRL or USD')
     provided = {'EUR': eur_rate, 'BRL': brl_rate, 'USD': usd_rate}
