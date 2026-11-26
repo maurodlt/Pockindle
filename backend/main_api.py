@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title='Class_Diagram_2 API',
+    title='Pockindle API',
     description='Auto-generated REST API with full CRUD operations, relationship management, and advanced features',
     version='1.0.0',
     docs_url="/docs",
@@ -197,6 +197,48 @@ def health_check(database: Session = Depends(get_db)):
     }
 
 
+@app.get('/transfer/', tags=['Transfer'])
+def list_transfers(database: Session = Depends(get_db)):
+    return database.query(Transfer).order_by(Transfer.date.desc(), Transfer.id.desc()).all()
+
+
+@app.post('/transfer/', tags=['Transfer'])
+def create_transfer(transfer: TransferCreate, database: Session = Depends(get_db)):
+    source = database.get(Account, transfer.fromAccount)
+    destination = database.get(Account, transfer.toAccount)
+    if source is None or destination is None:
+        raise HTTPException(status_code=404, detail='Both transfer accounts must exist')
+    if source.currency != destination.currency:
+        raise HTTPException(status_code=422, detail='Transfer accounts must share a currency')
+    if transfer.date < source.openingBalanceDate or transfer.date < destination.openingBalanceDate:
+        raise HTTPException(status_code=422, detail='Transfer date must not precede either opening balance date')
+    record = Transfer(fromAccount_id=source.id, toAccount_id=destination.id,
+                      amount=transfer.amount, date=transfer.date, description=transfer.description)
+    database.add(record)
+    database.commit()
+    database.refresh(record)
+    return record
+
+
+@app.get('/transfer/{transfer_id}/', tags=['Transfer'])
+def get_transfer(transfer_id: int, database: Session = Depends(get_db)):
+    record = database.get(Transfer, transfer_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail='Transfer not found')
+    return {'transfer': record}
+
+
+@app.delete('/transfer/{transfer_id}/', tags=['Transfer'])
+def delete_transfer(transfer_id: int, database: Session = Depends(get_db)):
+    record = database.get(Transfer, transfer_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail='Transfer not found')
+    result = {'id': record.id}
+    database.delete(record)
+    database.commit()
+    return result
+
+
 @app.get('/dashboard/', tags=['System'])
 def dashboard(months: int = 6, database: Session = Depends(get_db)):
     if not 1 <= months <= 60:
@@ -211,6 +253,38 @@ def dashboard(months: int = 6, database: Session = Depends(get_db)):
             'currentMonthSpending': projection[0]['spending'],
             'futureMonthSpending': sum(m['spending'] for m in projection[1:]),
             'averageMonthlySpending': round(sum(m['spending'] for m in projection) / months, 2),
+        }
+    from cashflow import occurrences, month_end, add_months
+    from decimal import Decimal
+    first = date.today().replace(day=1)
+    last = month_end(first)
+    categories = {category.id: category.name for category in database.query(Category).all()}
+    entries = database.query(Entry).all()
+    for currency, summary in by_currency.items():
+        selected = [a for a in accounts if a.currency == currency]
+        summary['accounts'] = [
+            {'id': a.id, 'name': a.name, 'months': project(database, [a], months)}
+            for a in selected
+        ]
+        summary['groups'] = [
+            {'id': group.id, 'name': group.name, 'months': project(database, members, months)}
+            for group in database.query(AccountGroup).all()
+            if (members := [a for a in group.accounts]) and all(a.currency == currency for a in members)
+        ]
+        chart = {'revenue': {}, 'expense': {}}
+        selected_ids = {a.id for a in selected}
+        for entry in entries:
+            if entry.account_id not in selected_ids or entry.type_spec not in chart:
+                continue
+            account = next(a for a in selected if a.id == entry.account_id)
+            count = sum(1 for day in occurrences(entry, max(first, account.openingBalanceDate), last))
+            if count:
+                name = categories.get(entry.category_id, 'Uncategorized')
+                amounts = chart[entry.type_spec]
+                amounts[name] = amounts.get(name, Decimal('0')) + Decimal(str(entry.amount)) * count
+        summary['categories'] = {
+            kind: [{'name': name, 'amount': float(amount)} for name, amount in sorted(values.items())]
+            for kind, values in chart.items()
         }
     return {'asOf': date.today().isoformat(), 'currencies': by_currency}
 

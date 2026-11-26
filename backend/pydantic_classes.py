@@ -24,7 +24,7 @@ class EntryCreate(ABC, BaseModel):
     recurrenceIntervalMonths: Optional[int] = None
     startDate: date
     account: int  # N:1 Relationship (mandatory)
-    category: int  # N:1 Relationship (mandatory)
+    category: Optional[int] = None  # Categories are optional for entries.
 
     @field_validator('amount')
     @classmethod
@@ -53,6 +53,27 @@ class RevenueCreate(EntryCreate):
 
 class ExpenseCreate(EntryCreate):
     expenseType: ExpenseType
+
+
+class TransferCreate(BaseModel):
+    fromAccount: int
+    toAccount: int
+    amount: float
+    date: date
+    description: str = ''
+
+    @field_validator('amount')
+    @classmethod
+    def positive_amount(cls, value):
+        if not 0 < value < float('inf'):
+            raise ValueError('Transfer amount must be positive and finite')
+        return value
+
+    @model_validator(mode='after')
+    def different_accounts(self):
+        if self.fromAccount == self.toAccount:
+            raise ValueError('Transfer accounts must be different')
+        return self
 
 
 class CategoryCreate(BaseModel):

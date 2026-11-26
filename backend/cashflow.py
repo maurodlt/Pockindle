@@ -5,7 +5,7 @@ from datetime import date
 from decimal import Decimal
 
 from sqlalchemy.orm import Session
-from sql_alchemy import Account, Entry
+from sql_alchemy import Account, Entry, Transfer
 
 
 def add_months(day: date, months: int) -> date:
@@ -73,6 +73,23 @@ def project(
             if 0 <= index < months:
                 key = "spending" if entry.type_spec == "expense" else "revenue"
                 buckets[index][key] += Decimal(str(entry.amount))
+    transfers = (
+        database.query(Transfer).filter(
+            (Transfer.fromAccount_id.in_(account_ids)) | (Transfer.toAccount_id.in_(account_ids))
+        ).all() if account_ids else []
+    )
+    for transfer in transfers:
+        if not first_month <= transfer.date <= last:
+            continue
+        index = (transfer.date.year - today.year) * 12 + transfer.date.month - today.month
+        if transfer.fromAccount_id in account_ids:
+            source = next(a for a in accounts if a.id == transfer.fromAccount_id)
+            if transfer.date >= source.openingBalanceDate:
+                buckets[index]['spending'] += Decimal(str(transfer.amount))
+        if transfer.toAccount_id in account_ids:
+            destination = next(a for a in accounts if a.id == transfer.toAccount_id)
+            if transfer.date >= destination.openingBalanceDate:
+                buckets[index]['revenue'] += Decimal(str(transfer.amount))
     balance = Decimal("0")
     result = []
     for index, bucket in enumerate(buckets):

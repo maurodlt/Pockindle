@@ -9,6 +9,7 @@ from sql_alchemy import *
 from database import get_db, integrity_error_detail
 from bal_stdlib import *
 from cashflow import project
+from sql_alchemy import Transfer
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -322,6 +323,10 @@ def account_delete_conflict(db_account, deleting=None, wholes=()):
     if deleting is None:
         state = sa_inspect(db_account)
         deleting = [db_account] + [item[0] for item in state.mapper.cascade_iterator("delete", state)]
+    if sa_inspect(db_account).session.query(Transfer.id).filter(
+        (Transfer.fromAccount_id == db_account.id) | (Transfer.toAccount_id == db_account.id)
+    ).first() is not None:
+        return 'Account has transfers; remove its transfers before deleting it'
     related_entries = db_account.entries
     for related in (list(related_entries) if isinstance(related_entries, list) else [item for item in [related_entries] if item is not None]):
         remaining = 0

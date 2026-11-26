@@ -118,8 +118,6 @@ async def create_revenue(revenue_data: RevenueCreate, database: Session = Depend
         related_category = database.query(Category).filter(Category.id == revenue_data.category).first()
         if not related_category:
             raise HTTPException(status_code=400, detail="Category not found")
-    else:
-        raise HTTPException(status_code=400, detail="Category ID is required")
 
     db_revenue = Revenue(
         amount=revenue_data.amount,        description=revenue_data.description,        endDate=revenue_data.endDate,        recurrenceIntervalMonths=revenue_data.recurrenceIntervalMonths,        startDate=revenue_data.startDate,        account_id=revenue_data.account,        category_id=revenue_data.category        )
@@ -148,8 +146,8 @@ async def bulk_create_revenue(items: list[RevenueCreate], database: Session = De
             # Basic validation for each item
             if not item_data.account:
                 raise ValueError("Account ID is required")
-            if not item_data.category:
-                raise ValueError("Category ID is required")
+            if item_data.category is not None and database.get(Category, item_data.category) is None:
+                raise ValueError("Category not found")
 
             db_revenue = Revenue(
                 amount=item_data.amount,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                account_id=item_data.account,                category_id=item_data.category            )
@@ -214,7 +212,7 @@ async def update_revenue(revenue_id: int, revenue_data: RevenueCreate, database:
     setattr(db_revenue, 'startDate', revenue_data.startDate)
     for field, model in [('account', Account), ('category', Category)]:
         related_id = getattr(revenue_data, field)
-        if database.get(model, related_id) is None:
+        if (related_id is None and field == 'account') or (related_id is not None and database.get(model, related_id) is None):
             raise HTTPException(status_code=400, detail=f'{field.title()} not found')
         setattr(db_revenue, field + '_id', related_id)
     database.commit()

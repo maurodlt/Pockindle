@@ -85,7 +85,7 @@ class Entry(Base):
     endDate: Mapped_[Optional_[dt_date]] = mapped_column(Date_, nullable=True)
     recurrenceIntervalMonths: Mapped_[Optional_[int]] = mapped_column(Integer_, nullable=True)
     account_id: Mapped_[int] = mapped_column(ForeignKey_("account.id"))
-    category_id: Mapped_[int] = mapped_column(ForeignKey_("category.id"))
+    category_id: Mapped_[Optional_[int]] = mapped_column(ForeignKey_("category.id"), nullable=True)
     type_spec: Mapped_[str] = mapped_column(String_(50))
     __mapper_args__ = {
         "polymorphic_identity": "entry",
@@ -106,6 +106,16 @@ class Expense(Entry):
     __mapper_args__ = {
         "polymorphic_identity": "expense",
     }
+
+class Transfer(Base):
+    __tablename__ = "transfer"
+    id: Mapped_[int] = mapped_column(primary_key=True)
+    fromAccount_id: Mapped_[int] = mapped_column(ForeignKey_("account.id"), nullable=False)
+    toAccount_id: Mapped_[int] = mapped_column(ForeignKey_("account.id"), nullable=False)
+    amount: Mapped_[float] = mapped_column(Float_, nullable=False)
+    date: Mapped_[dt_date] = mapped_column(Date_, nullable=False)
+    description: Mapped_[str] = mapped_column(String_(100), default="")
+
 
 class Category(Base):
     __tablename__ = "category"

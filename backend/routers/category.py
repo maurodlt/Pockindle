@@ -225,7 +225,9 @@ async def update_category(category_id: int, category_data: CategoryCreate, datab
         }
         entries_to_detach = current_entries - requested_entries
         if entries_to_detach:
-            raise HTTPException(status_code=409, detail="Entry " + ", ".join(str(item) for item in sorted(entries_to_detach)) + " requires a category: reassign it instead of removing it")
+            database.query(Entry).filter(Entry.id.in_(entries_to_detach)).update(
+                {Entry.category_id: None}, synchronize_session=False
+            )
         entries_to_attach = requested_entries - current_entries
         for related_entry_id in entries_to_attach:
             related_entry = database.query(Entry).filter(Entry.id == related_entry_id).first()
@@ -253,11 +255,6 @@ def category_delete_conflict(db_category, deleting=None, wholes=()):
     if deleting is None:
         state = sa_inspect(db_category)
         deleting = [db_category] + [item[0] for item in state.mapper.cascade_iterator("delete", state)]
-    related_entries = db_category.entries
-    for related in (list(related_entries) if isinstance(related_entries, list) else [item for item in [related_entries] if item is not None]):
-        remaining = 0
-        if related not in deleting and remaining < 1:
-            return "Entry " + str(getattr(related, 'id')) + " requires at least 1 category"
     return None
 
 
@@ -276,6 +273,9 @@ async def delete_category(category_id: int, database: Session = Depends(get_db))
         attr.key: getattr(db_category, attr.key)
         for attr in db_category.__mapper__.column_attrs
     }
+    database.query(Entry).filter(Entry.category_id == category_id).update(
+        {Entry.category_id: None}, synchronize_session=False
+    )
     database.delete(db_category)
     database.commit()
     return deleted_category

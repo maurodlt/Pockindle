@@ -33,6 +33,25 @@ def init_db():
     _configure_sqlite_engine(engine)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     Base.metadata.create_all(bind=engine)
+    # Existing SQLite databases predate optional entry categories. Rebuild only
+    # that column's nullability, retaining rows, indexes, and foreign keys.
+    if engine.dialect.name == 'sqlite':
+        with engine.begin() as connection:
+            columns = connection.exec_driver_sql('PRAGMA table_info(entry)').fetchall()
+            if columns and any(col[1] == 'category_id' and col[3] for col in columns):
+                original = connection.exec_driver_sql(
+                    "SELECT sql FROM sqlite_master WHERE type='table' AND name='entry'").scalar()
+                updated = re.sub(r'(?i)(category_id\s+INTEGER)\s+NOT NULL', r'\1', original)
+                if updated == original:
+                    raise RuntimeError('Cannot migrate entry.category_id nullability')
+                connection.exec_driver_sql('PRAGMA writable_schema=ON')
+                try:
+                    connection.exec_driver_sql(
+                        "UPDATE sqlite_master SET sql=? WHERE type='table' AND name='entry'", (updated,))
+                finally:
+                    connection.exec_driver_sql('PRAGMA writable_schema=OFF')
+                connection.exec_driver_sql('PRAGMA schema_version = ' + str(
+                    connection.exec_driver_sql('PRAGMA schema_version').scalar() + 1))
     return SessionLocal
 
 # Initialize database session

@@ -5,12 +5,12 @@ const entryFields = [
   { name: 'endDate', label: 'End date', type: 'date' },
   { name: 'recurrenceIntervalMonths', label: 'Repeat every (months)', type: 'number', step: '1', min: '1' },
   { name: 'account', label: 'Account', type: 'reference', source: 'account', required: true },
-  { name: 'category', label: 'Category', type: 'reference', source: 'category', required: true }
+  { name: 'category', label: 'Category', type: 'reference', source: 'category' }
 ]
 export const entities = {
   account: { label: 'Accounts', singular: 'Account', fields: [
     { name: 'name', label: 'Name', type: 'text', required: true },
-    { name: 'currency', label: 'Currency code', type: 'text', required: true },
+    { name: 'currency', label: 'Currency code', type: 'enum', options: ['EUR', 'BRL', 'USD'], required: true },
     { name: 'openingBalance', label: 'Opening balance', type: 'number', required: true },
     { name: 'openingBalanceDate', label: 'Balance as of', type: 'date', required: true },
     { name: 'groups', label: 'Groups', type: 'multi', source: 'accountgroup' }
