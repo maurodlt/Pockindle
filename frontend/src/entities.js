@@ -21,12 +21,12 @@ export const entities = {
   ] },
   category: { label: 'Categories', singular: 'Category', fields: [
     { name: 'name', label: 'Name', type: 'text', required: true },
-    { name: 'kind', label: 'For entries', type: 'enum', options: ['revenue', 'expense'], required: true }
+    { name: 'kind', label: 'For entries', type: 'enum', options: ['income', 'expense'], required: true }
   ] },
   entry: { label: 'All entries', singular: 'Entry', fields: entryFields, readOnlyCreate: true },
   expense: { label: 'Expenses', singular: 'Expense', fields: [...entryFields,
     { name: 'expenseType', label: 'Expense type', type: 'enum', options: ['FIX', 'VARIABLE', 'EXTRAORDINARY'], required: true }] },
-  revenue: { label: 'Revenues', singular: 'Revenue', fields: entryFields }
+  income: { label: 'Income', singular: 'Income', fields: entryFields }
 }
 export const today = () => new Date().toLocaleDateString('en-CA')
 export function initialValues(entity) {

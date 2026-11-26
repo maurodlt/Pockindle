@@ -92,11 +92,11 @@ class Entry(Base):
         "polymorphic_on": "type_spec",
     }
 
-class Revenue(Entry):
-    __tablename__ = "revenue"
+class Income(Entry):
+    __tablename__ = "revenue"  # Keep existing records in place.
     id: Mapped_[int] = mapped_column(ForeignKey_("entry.id"), primary_key=True)
     __mapper_args__ = {
-        "polymorphic_identity": "revenue",
+        "polymorphic_identity": "income",
     }
 
 class Expense(Entry):

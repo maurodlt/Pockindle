@@ -11,7 +11,7 @@ from database import get_db, integrity_error_detail
 from datetime import date
 from cashflow import project
 from routers import entry as entry_router
-from routers import revenue as revenue_router
+from routers import revenue as income_router
 from routers import expense as expense_router
 from routers import category as category_router
 from routers import accountgroup as accountgroup_router
@@ -31,7 +31,7 @@ app = FastAPI(
         {"name": "System", "description": "System health and statistics"},
         {"name": "Entry", "description": "Operations for Entry entities"},
         {"name": "Entry Relationships", "description": "Manage Entry relationships"},
-        {"name": "Revenue", "description": "Operations for Revenue entities"},
+        {"name": "Income", "description": "Operations for Income entities"},
         {"name": "Expense", "description": "Operations for Expense entities"},
         {"name": "Category", "description": "Operations for Category entities"},
         {"name": "Category Relationships", "description": "Manage Category relationships"},
@@ -150,7 +150,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 ############################################
 
 app.include_router(entry_router.router)
-app.include_router(revenue_router.router)
+app.include_router(income_router.router)
 app.include_router(expense_router.router)
 app.include_router(category_router.router)
 app.include_router(accountgroup_router.router)
@@ -272,7 +272,7 @@ def dashboard(months: int = 6, database: Session = Depends(get_db)):
             for group in database.query(AccountGroup).all()
             if (members := [a for a in group.accounts]) and all(a.currency == currency for a in members)
         ]
-        chart = {'revenue': {}, 'expense': {}}
+        chart = {'income': {}, 'expense': {}}
         selected_ids = {a.id for a in selected}
         for entry in entries:
             if entry.account_id not in selected_ids or entry.type_spec not in chart:
@@ -295,7 +295,7 @@ def get_statistics(database: Session = Depends(get_db)):
     """Get database statistics for all entities"""
     stats = {}
     stats["entry_count"] = database.query(Entry).count()
-    stats["revenue_count"] = database.query(Revenue).count()
+    stats["income_count"] = database.query(Income).count()
     stats["expense_count"] = database.query(Expense).count()
     stats["category_count"] = database.query(Category).count()
     stats["accountgroup_count"] = database.query(AccountGroup).count()

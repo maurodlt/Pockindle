@@ -13,32 +13,32 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/revenue/", response_model=None, tags=["Revenue"])
-def get_all_revenue(detailed: bool = False, database: Session = Depends(get_db)) -> list:
+@router.get("/income/", response_model=None, tags=["Income"])
+def get_all_income(detailed: bool = False, database: Session = Depends(get_db)) -> list:
     # Use detailed=true to get entities with eagerly loaded relationships (for tables with lookup columns)
     if detailed:
         # Eagerly load all relationships to avoid N+1 queries
-        query = database.query(Revenue)
-        query = query.options(joinedload(Revenue.account))
-        query = query.options(joinedload(Revenue.category))
-        revenue_list = query.all()
+        query = database.query(Income)
+        query = query.options(joinedload(Income.account))
+        query = query.options(joinedload(Income.category))
+        income_list = query.all()
 
         # Serialize with relationships included
         result = []
-        for db_revenue in revenue_list:
-            item_dict = db_revenue.__dict__.copy()
+        for db_income in income_list:
+            item_dict = db_income.__dict__.copy()
             item_dict.pop('_sa_instance_state', None)
 
             # Add many-to-one relationships (foreign keys for lookup columns)
-            if db_revenue.account:
-                related_obj = db_revenue.account
+            if db_income.account:
+                related_obj = db_income.account
                 related_dict = related_obj.__dict__.copy()
                 related_dict.pop('_sa_instance_state', None)
                 item_dict['account'] = related_dict
             else:
                 item_dict['account'] = None
-            if db_revenue.category:
-                related_obj = db_revenue.category
+            if db_income.category:
+                related_obj = db_income.category
                 related_dict = related_obj.__dict__.copy()
                 related_dict.pop('_sa_instance_state', None)
                 item_dict['category'] = related_dict
@@ -50,119 +50,119 @@ def get_all_revenue(detailed: bool = False, database: Session = Depends(get_db))
         return result
     else:
         # Default: return flat entities (faster for charts/widgets without lookup columns)
-        return database.query(Revenue).all()
+        return database.query(Income).all()
 
 
-@router.get("/revenue/count/", response_model=None, tags=["Revenue"])
-def get_count_revenue(database: Session = Depends(get_db)) -> dict:
-    """Get the total count of Revenue entities"""
-    count = database.query(Revenue).count()
+@router.get("/income/count/", response_model=None, tags=["Income"])
+def get_count_income(database: Session = Depends(get_db)) -> dict:
+    """Get the total count of Income entities"""
+    count = database.query(Income).count()
     return {"count": count}
 
 
-@router.get("/revenue/paginated/", response_model=None, tags=["Revenue"])
-def get_paginated_revenue(skip: int = 0, limit: int = 100, detailed: bool = False, database: Session = Depends(get_db)) -> dict:
-    """Get paginated list of Revenue entities"""
-    total = database.query(Revenue).count()
-    revenue_list = database.query(Revenue).offset(skip).limit(limit).all()
+@router.get("/income/paginated/", response_model=None, tags=["Income"])
+def get_paginated_income(skip: int = 0, limit: int = 100, detailed: bool = False, database: Session = Depends(get_db)) -> dict:
+    """Get paginated list of Income entities"""
+    total = database.query(Income).count()
+    income_list = database.query(Income).offset(skip).limit(limit).all()
     return {
         "total": total,
         "skip": skip,
         "limit": limit,
-        "data": revenue_list
+        "data": income_list
     }
-@router.get("/revenue/search/", response_model=None, tags=["Revenue"])
-def search_revenue(
+@router.get("/income/search/", response_model=None, tags=["Income"])
+def search_income(
     amount: float = None,
     description: str = None,
     recurrenceIntervalMonths: int = None,
     database: Session = Depends(get_db)
 ) -> list:
-    """Search Revenue entities by attributes"""
-    query = database.query(Revenue)
+    """Search Income entities by attributes"""
+    query = database.query(Income)
 
     if amount is not None:
-        query = query.filter(Revenue.amount == amount)
+        query = query.filter(Income.amount == amount)
     if description is not None:
-        query = query.filter(Revenue.description.ilike(f"%{description}%"))
+        query = query.filter(Income.description.ilike(f"%{description}%"))
     if recurrenceIntervalMonths is not None:
-        query = query.filter(Revenue.recurrenceIntervalMonths == recurrenceIntervalMonths)
+        query = query.filter(Income.recurrenceIntervalMonths == recurrenceIntervalMonths)
 
     results = query.all()
     return results
 
 
-@router.get("/revenue/{revenue_id}/", response_model=None, tags=["Revenue"])
-async def get_revenue(revenue_id: int, database: Session = Depends(get_db)) -> Revenue:
-    db_revenue = database.query(Revenue).filter(Revenue.id == revenue_id).first()
-    if db_revenue is None:
-        raise HTTPException(status_code=404, detail="Revenue not found")
+@router.get("/income/{income_id}/", response_model=None, tags=["Income"])
+async def get_income(income_id: int, database: Session = Depends(get_db)) -> Income:
+    db_income = database.query(Income).filter(Income.id == income_id).first()
+    if db_income is None:
+        raise HTTPException(status_code=404, detail="Income not found")
 
     response_data = {
-        "revenue": db_revenue,
+        "income": db_income,
 }
     return response_data
 
 
 
-@router.post("/revenue/", response_model=None, tags=["Revenue"])
-async def create_revenue(revenue_data: RevenueCreate, database: Session = Depends(get_db)) -> Revenue:
+@router.post("/income/", response_model=None, tags=["Income"])
+async def create_income(income_data: IncomeCreate, database: Session = Depends(get_db)) -> Income:
 
-    if revenue_data.account is not None:
-        related_account = database.query(Account).filter(Account.id == revenue_data.account).first()
+    if income_data.account is not None:
+        related_account = database.query(Account).filter(Account.id == income_data.account).first()
         if not related_account:
             raise HTTPException(status_code=400, detail="Account not found")
     else:
         raise HTTPException(status_code=400, detail="Account ID is required")
-    if revenue_data.category is not None:
-        related_category = database.query(Category).filter(Category.id == revenue_data.category).first()
+    if income_data.category is not None:
+        related_category = database.query(Category).filter(Category.id == income_data.category).first()
         if not related_category:
             raise HTTPException(status_code=400, detail="Category not found")
-        if related_category.kind != 'revenue':
-            raise HTTPException(status_code=422, detail='Revenue requires a revenue category')
+        if related_category.kind != 'income':
+            raise HTTPException(status_code=422, detail='Income requires an income category')
 
-    db_revenue = Revenue(
-        amount=revenue_data.amount,        description=revenue_data.description,        endDate=revenue_data.endDate,        recurrenceIntervalMonths=revenue_data.recurrenceIntervalMonths,        startDate=revenue_data.startDate,        account_id=revenue_data.account,        category_id=revenue_data.category        )
+    db_income = Income(
+        amount=income_data.amount,        description=income_data.description,        endDate=income_data.endDate,        recurrenceIntervalMonths=income_data.recurrenceIntervalMonths,        startDate=income_data.startDate,        account_id=income_data.account,        category_id=income_data.category        )
 
-    database.add(db_revenue)
+    database.add(db_income)
     database.flush()
-    database.refresh(db_revenue)
+    database.refresh(db_income)
 
 
 
 
 
     database.commit()
-    database.refresh(db_revenue)
-    return db_revenue
+    database.refresh(db_income)
+    return db_income
 
 
-@router.post("/revenue/bulk/", response_model=None, tags=["Revenue"])
-async def bulk_create_revenue(items: list[RevenueCreate], database: Session = Depends(get_db)) -> dict:
-    """Create multiple Revenue entities at once"""
+@router.post("/income/bulk/", response_model=None, tags=["Income"])
+async def bulk_create_income(items: list[IncomeCreate], database: Session = Depends(get_db)) -> dict:
+    """Create multiple Income entities at once"""
     created_items = []
     errors = []
 
     for idx, item_data in enumerate(items):
         try:
             # Basic validation for each item
-            if not item_data.account:
-                raise ValueError("Account ID is required")
+            if database.get(Account, item_data.account) is None:
+                raise ValueError("Account not found")
             if item_data.category is not None and (category := database.get(Category, item_data.category)) is None:
                 raise ValueError("Category not found")
-            if item_data.category is not None and category.kind != 'revenue':
-                raise ValueError('Revenue requires a revenue category')
+            if item_data.category is not None and category.kind != 'income':
+                raise ValueError('Income requires an income category')
 
-            db_revenue = Revenue(
+            db_income = Income(
                 amount=item_data.amount,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                account_id=item_data.account,                category_id=item_data.category            )
-            database.add(db_revenue)
+            database.add(db_income)
             database.flush()  # Get ID without committing
-            created_items.append(db_revenue.id)
+            created_items.append(db_income.id)
         except ValueError as e:
             errors.append({"index": idx, "error": str(e)})
         except IntegrityError as e:
             # The driver's text goes to the log; a failed flush ends the session's work.
-            logger.error("Bulk creation of Revenue failed at item %s: %s", idx, e)
+            logger.error("Bulk creation of Income failed at item %s: %s", idx, e)
             errors.append({"index": idx, "error": integrity_error_detail(e)})
             break
 
@@ -174,23 +174,23 @@ async def bulk_create_revenue(items: list[RevenueCreate], database: Session = De
     return {
         "created_count": len(created_items),
         "created_ids": created_items,
-        "message": f"Successfully created {len(created_items)} Revenue entities"
+        "message": f"Successfully created {len(created_items)} Income entities"
     }
 
 
-@router.delete("/revenue/bulk/", response_model=None, tags=["Revenue"])
-async def bulk_delete_revenue(ids: list[int], database: Session = Depends(get_db)) -> dict:
-    """Delete multiple Revenue entities at once"""
+@router.delete("/income/bulk/", response_model=None, tags=["Income"])
+async def bulk_delete_income(ids: list[int], database: Session = Depends(get_db)) -> dict:
+    """Delete multiple Income entities at once"""
     deleted_count = 0
     not_found = []
 
     for item_id in ids:
-        db_revenue = database.query(Revenue).filter(Revenue.id == item_id).first()
-        if db_revenue:
-            conflict = revenue_delete_conflict(db_revenue)
+        db_income = database.query(Income).filter(Income.id == item_id).first()
+        if db_income:
+            conflict = income_delete_conflict(db_income)
             if conflict:
-                raise HTTPException(status_code=409, detail="Cannot delete Revenue " + str(item_id) + ": " + conflict)
-            database.delete(db_revenue)
+                raise HTTPException(status_code=409, detail="Cannot delete Income " + str(item_id) + ": " + conflict)
+            database.delete(db_income)
             deleted_count += 1
         else:
             not_found.append(item_id)
@@ -200,62 +200,62 @@ async def bulk_delete_revenue(ids: list[int], database: Session = Depends(get_db
     return {
         "deleted_count": deleted_count,
         "not_found": not_found,
-        "message": f"Successfully deleted {deleted_count} Revenue entities"
+        "message": f"Successfully deleted {deleted_count} Income entities"
     }
 
-@router.put("/revenue/{revenue_id}/", response_model=None, tags=["Revenue"])
-async def update_revenue(revenue_id: int, revenue_data: RevenueCreate, database: Session = Depends(get_db)) -> Revenue:
-    db_revenue = database.query(Revenue).filter(Revenue.id == revenue_id).first()
-    if db_revenue is None:
-        raise HTTPException(status_code=404, detail="Revenue not found")
+@router.put("/income/{income_id}/", response_model=None, tags=["Income"])
+async def update_income(income_id: int, income_data: IncomeCreate, database: Session = Depends(get_db)) -> Income:
+    db_income = database.query(Income).filter(Income.id == income_id).first()
+    if db_income is None:
+        raise HTTPException(status_code=404, detail="Income not found")
 
-    setattr(db_revenue, 'amount', revenue_data.amount)
-    setattr(db_revenue, 'description', revenue_data.description)
-    setattr(db_revenue, 'endDate', revenue_data.endDate)
-    setattr(db_revenue, 'recurrenceIntervalMonths', revenue_data.recurrenceIntervalMonths)
-    setattr(db_revenue, 'startDate', revenue_data.startDate)
+    setattr(db_income, 'amount', income_data.amount)
+    setattr(db_income, 'description', income_data.description)
+    setattr(db_income, 'endDate', income_data.endDate)
+    setattr(db_income, 'recurrenceIntervalMonths', income_data.recurrenceIntervalMonths)
+    setattr(db_income, 'startDate', income_data.startDate)
     for field, model in [('account', Account), ('category', Category)]:
-        related_id = getattr(revenue_data, field)
+        related_id = getattr(income_data, field)
         if (related_id is None and field == 'account') or (related_id is not None and database.get(model, related_id) is None):
             raise HTTPException(status_code=400, detail=f'{field.title()} not found')
-        if field == 'category' and related_id is not None and database.get(Category, related_id).kind != 'revenue':
-            raise HTTPException(status_code=422, detail='Revenue requires a revenue category')
-        setattr(db_revenue, field + '_id', related_id)
+        if field == 'category' and related_id is not None and database.get(Category, related_id).kind != 'income':
+            raise HTTPException(status_code=422, detail='Income requires an income category')
+        setattr(db_income, field + '_id', related_id)
     database.commit()
-    database.refresh(db_revenue)
+    database.refresh(db_income)
 
-    return db_revenue
+    return db_income
 
 
-def revenue_delete_conflict(db_revenue, deleting=None, wholes=()):
-    """Why this Revenue cannot be deleted (None when it can): a related record
+def income_delete_conflict(db_income, deleting=None, wholes=()):
+    """Why this Income cannot be deleted (None when it can): a related record
     would be left without a link it requires. Covers the parts deleted with it;
     ``deleting`` holds every record of the delete, since none of them can block it,
     and ``wholes`` the records on the way down to this part."""
     if deleting is None:
-        state = sa_inspect(db_revenue)
-        deleting = [db_revenue] + [item[0] for item in state.mapper.cascade_iterator("delete", state)]
+        state = sa_inspect(db_income)
+        deleting = [db_income] + [item[0] for item in state.mapper.cascade_iterator("delete", state)]
     return None
 
 
-@router.delete("/revenue/{revenue_id}/", response_model=None, tags=["Revenue"])
-async def delete_revenue(revenue_id: int, database: Session = Depends(get_db)):
-    db_revenue = database.query(Revenue).filter(Revenue.id == revenue_id).first()
-    if db_revenue is None:
-        raise HTTPException(status_code=404, detail="Revenue not found")
-    conflict = revenue_delete_conflict(db_revenue)
+@router.delete("/income/{income_id}/", response_model=None, tags=["Income"])
+async def delete_income(income_id: int, database: Session = Depends(get_db)):
+    db_income = database.query(Income).filter(Income.id == income_id).first()
+    if db_income is None:
+        raise HTTPException(status_code=404, detail="Income not found")
+    conflict = income_delete_conflict(db_income)
     if conflict:
-        raise HTTPException(status_code=409, detail="Cannot delete Revenue " + str(revenue_id) + ": " + conflict)
+        raise HTTPException(status_code=409, detail="Cannot delete Income " + str(income_id) + ": " + conflict)
     # Snapshot the columns before deleting: cascading the association-class
     # links loads relationship collections whose back-references would make
     # the JSON encoder recurse endlessly on the live object.
-    deleted_revenue = {
-        attr.key: getattr(db_revenue, attr.key)
-        for attr in db_revenue.__mapper__.column_attrs
+    deleted_income = {
+        attr.key: getattr(db_income, attr.key)
+        for attr in db_income.__mapper__.column_attrs
     }
-    database.delete(db_revenue)
+    database.delete(db_income)
     database.commit()
-    return deleted_revenue
+    return deleted_income
 
 
 

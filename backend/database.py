@@ -71,6 +71,9 @@ def init_db():
                             'SELECT 1 FROM entry WHERE category_id=? LIMIT 1', (category_id,)
                         ).first():
                             connection.exec_driver_sql('DELETE FROM category WHERE id=?', (category_id,))
+            # Rename the discriminator and category kind without replacing existing data.
+            connection.exec_driver_sql("UPDATE entry SET type_spec='income' WHERE type_spec='revenue'")
+            connection.exec_driver_sql("UPDATE category SET kind='income' WHERE kind='revenue'")
             transfer_columns = {col[1] for col in connection.exec_driver_sql('PRAGMA table_info(transfer)')}
             if 'recurrenceIntervalMonths' not in transfer_columns:
                 connection.exec_driver_sql('ALTER TABLE transfer ADD COLUMN "recurrenceIntervalMonths" INTEGER')

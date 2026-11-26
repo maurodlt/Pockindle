@@ -81,7 +81,7 @@ def project(
         if account_ids
         else []
     )
-    buckets = [dict(revenue=Decimal("0"), spending=Decimal("0")) for _ in range(months)]
+    buckets = [dict(income=Decimal("0"), spending=Decimal("0")) for _ in range(months)]
     for entry in entries:
         account = next(a for a in accounts if a.id == entry.account_id)
         for day in occurrences(entry, account.openingBalanceDate, last):
@@ -89,7 +89,7 @@ def project(
                 continue  # Previous activity is already represented by the opening balance.
             index = (day.year - today.year) * 12 + day.month - today.month
             if 0 <= index < months:
-                key = "spending" if entry.type_spec == "expense" else "revenue"
+                key = "spending" if entry.type_spec == "expense" else "income"
                 buckets[index][key] += Decimal(str(entry.amount))
     transfers = (
         database.query(Transfer).filter(
@@ -108,7 +108,7 @@ def project(
             if transfer.toAccount_id in account_ids:
                 destination = next(a for a in accounts if a.id == transfer.toAccount_id)
                 if day >= destination.openingBalanceDate:
-                    buckets[index]['revenue'] += Decimal(str(transfer.amount))
+                    buckets[index]['income'] += Decimal(str(transfer.amount))
     balance = Decimal("0")
     result = []
     for index, bucket in enumerate(buckets):
@@ -128,11 +128,11 @@ def project(
             Decimal("0"),
         )
         balance += opening
-        balance += bucket["revenue"] - bucket["spending"]
+        balance += bucket["income"] - bucket["spending"]
         result.append(
             {
                 "month": start.strftime("%Y-%m"),
-                "revenue": float(bucket["revenue"]),
+                "income": float(bucket["income"]),
                 "spending": float(bucket["spending"]),
                 "endBalance": float(balance),
             }

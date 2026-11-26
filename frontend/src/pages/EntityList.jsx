@@ -14,7 +14,7 @@ export function Projection({ entity, id }) {
   if (!data) return <p>Loading projection…</p>
   return <section className="card"><h2>Monthly cashflow · {data.currency}</h2><p className="muted">Projected end-of-month balances, based on your opening balances and scheduled entries.</p>
     <div className="table-scroll"><table><thead><tr><th>Month</th><th>Income</th><th>Spending</th><th>End balance</th></tr></thead><tbody>
-      {data.months.map(row => <tr key={row.month}><td>{row.month}</td><td>{row.revenue.toFixed(2)}</td><td>{row.spending.toFixed(2)}</td><td><strong>{row.endBalance.toFixed(2)}</strong></td></tr>)}
+      {data.months.map(row => <tr key={row.month}><td>{row.month}</td><td>{row.income.toFixed(2)}</td><td>{row.spending.toFixed(2)}</td><td><strong>{row.endBalance.toFixed(2)}</strong></td></tr>)}
     </tbody></table></div></section>
 }
 
@@ -27,7 +27,7 @@ export function EntityList({ entity }) {
   function refresh() { setRows(null); setError(''); list(entity).then(setRows).catch(e => setError(e.message)) }
   useEffect(refresh, [entity])
   useEffect(() => {
-    if (!['entry', 'revenue', 'expense'].includes(entity)) return
+    if (!['entry', 'income', 'expense'].includes(entity)) return
     list('category').then(setCategories).catch(e => setError(e.message))
   }, [entity])
   async function erase(row) {
@@ -50,7 +50,7 @@ export function EntityList({ entity }) {
         <Link to={`/${entity}/${row.id}/edit`}>Edit</Link><button className="text-button danger" onClick={() => erase(row)}>Delete</button></td>
     </tr>)}</tbody></table></div>}
   {selected && <Projection entity={entity} id={selected} />}
-  {entity === 'entry' && <p className="muted">New entries are added as revenues or expenses. Edit or delete them here, too.</p>}
+  {entity === 'entry' && <p className="muted">New entries are added as income or expenses. Edit or delete them here, too.</p>}
   </main>
 }
 
@@ -65,7 +65,7 @@ export function EntityForm({ entity }) {
   const [busy, setBusy] = useState(false)
   const [newCategory, setNewCategory] = useState('')
   const [addingCategory, setAddingCategory] = useState(false)
-  const categoryKind = entity === 'entry' ? (values.expenseType ? 'expense' : 'revenue') : entity
+  const categoryKind = entity === 'entry' ? (values.expenseType ? 'expense' : 'income') : entity
   async function createCategory() {
     if (!newCategory.trim()) return
     setAddingCategory(true); setError('')
@@ -97,9 +97,9 @@ export function EntityForm({ entity }) {
     {loading ? <p>Loading {config.singular.toLowerCase()}…</p> : <form className="card form" onSubmit={submit}>{config.fields.map(field => <label key={field.name} className="field"><span>{field.label}{field.required && ' *'}</span>
       {field.type === 'multi' ? <div className="checks">{(options[field.source] || []).length === 0 ? <span className="muted">Create an {field.source === 'account' ? 'account' : 'account group'} first.</span> : options[field.source].map(option => <label key={option.id}><input type="checkbox" checked={(values[field.name] || []).includes(option.id)} onChange={event => setValues(current => ({ ...current, [field.name]: event.target.checked ? [...(current[field.name] || []), option.id] : current[field.name].filter(value => value !== option.id) }))}/>{option.name}</label>)}</div>
       : field.type === 'reference' || field.type === 'enum' ? <select value={values[field.name] ?? ''} required={field.required} onChange={event => setValues({ ...values, [field.name]: event.target.value })}>
-        {field.type === 'reference' ? <><option value="">Choose {field.label.toLowerCase()}</option>{(options[field.source] || []).filter(option => field.name !== 'category' || entity === 'entry' || option.kind === entity).map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</> : field.options.map(option => <option key={option} value={option}>{option === 'FIX' ? 'Fixed' : option === 'VARIABLE' ? 'Variable' : option === 'EXTRAORDINARY' ? 'Extraordinary' : option}</option>)}</select>
+        {field.type === 'reference' ? <><option value="">Choose {field.label.toLowerCase()}</option>{(options[field.source] || []).filter(option => field.name !== 'category' || option.kind === (entity === 'entry' ? values.type_spec : entity)).map(option => <option key={option.id} value={option.id}>{option.name}</option>)}</> : field.options.map(option => <option key={option} value={option}>{option === 'FIX' ? 'Fixed' : option === 'VARIABLE' ? 'Variable' : option === 'EXTRAORDINARY' ? 'Extraordinary' : option}</option>)}</select>
       : <input type={field.type} value={values[field.name] ?? ''} required={field.required} min={field.min} step={field.type === 'number' ? field.step || 'any' : undefined} onChange={event => setValues({ ...values, [field.name]: event.target.value })}/>}
-      {field.name === 'category' && (entity === 'revenue' || entity === 'expense') && <span className="inline-category"><input aria-label={`New ${entity} category name`} placeholder={`New ${entity} category`} value={newCategory} onChange={event => setNewCategory(event.target.value)} /><button type="button" className="button" disabled={addingCategory || !newCategory.trim()} onClick={createCategory}>{addingCategory ? 'Adding…' : 'Add category'}</button></span>}</label>)}
+      {field.name === 'category' && (entity === 'income' || entity === 'expense') && <span className="inline-category"><input aria-label={`New ${entity} category name`} placeholder={`New ${entity} category`} value={newCategory} onChange={event => setNewCategory(event.target.value)} /><button type="button" className="button" disabled={addingCategory || !newCategory.trim()} onClick={createCategory}>{addingCategory ? 'Adding…' : 'Add category'}</button></span>}</label>)}
       <div className="form-actions"><button className="button" disabled={busy || (entity === 'accountgroup' && !(values.accounts || []).length)}>{busy ? 'Saving…' : id ? 'Save changes' : `Create ${config.singular.toLowerCase()}`}</button><Link to={`/${entity}`}>Cancel</Link></div>
     </form>}
   </main>

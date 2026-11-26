@@ -47,7 +47,7 @@ class EntryCreate(ABC, BaseModel):
         return self
 
 
-class RevenueCreate(EntryCreate):
+class IncomeCreate(EntryCreate):
     pass
 
 
@@ -89,7 +89,7 @@ class TransferCreate(BaseModel):
 
 class CategoryCreate(BaseModel):
     name: str
-    kind: Literal['revenue', 'expense']
+    kind: Literal['income', 'expense']
     entries: Optional[List[int]] = None  # 1:N Relationship
 
 
