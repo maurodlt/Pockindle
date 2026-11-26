@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 from pydantic_classes import *
 from sql_alchemy import *
+from sql_alchemy import OccurrenceAmount
 from database import get_db, integrity_error_detail
 from bal_stdlib import *
 
@@ -122,7 +123,7 @@ async def create_income(income_data: IncomeCreate, database: Session = Depends(g
             raise HTTPException(status_code=422, detail='Income requires an income category')
 
     db_income = Income(
-        amount=income_data.amount,        description=income_data.description,        endDate=income_data.endDate,        recurrenceIntervalMonths=income_data.recurrenceIntervalMonths,        startDate=income_data.startDate,        account_id=income_data.account,        category_id=income_data.category        )
+        amount=income_data.amount,        description=income_data.description,        endDate=income_data.endDate,        recurrenceIntervalMonths=income_data.recurrenceIntervalMonths,        startDate=income_data.startDate,        incomeType=income_data.incomeType.value,        account_id=income_data.account,        category_id=income_data.category        )
 
     database.add(db_income)
     database.flush()
@@ -154,7 +155,7 @@ async def bulk_create_income(items: list[IncomeCreate], database: Session = Depe
                 raise ValueError('Income requires an income category')
 
             db_income = Income(
-                amount=item_data.amount,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                account_id=item_data.account,                category_id=item_data.category            )
+                amount=item_data.amount,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                incomeType=item_data.incomeType.value,                account_id=item_data.account,                category_id=item_data.category            )
             database.add(db_income)
             database.flush()  # Get ID without committing
             created_items.append(db_income.id)
@@ -190,6 +191,7 @@ async def bulk_delete_income(ids: list[int], database: Session = Depends(get_db)
             conflict = income_delete_conflict(db_income)
             if conflict:
                 raise HTTPException(status_code=409, detail="Cannot delete Income " + str(item_id) + ": " + conflict)
+            database.query(OccurrenceAmount).filter_by(entry_id=item_id).delete()
             database.delete(db_income)
             deleted_count += 1
         else:
@@ -214,6 +216,7 @@ async def update_income(income_id: int, income_data: IncomeCreate, database: Ses
     setattr(db_income, 'endDate', income_data.endDate)
     setattr(db_income, 'recurrenceIntervalMonths', income_data.recurrenceIntervalMonths)
     setattr(db_income, 'startDate', income_data.startDate)
+    setattr(db_income, 'incomeType', income_data.incomeType.value)
     for field, model in [('account', Account), ('category', Category)]:
         related_id = getattr(income_data, field)
         if (related_id is None and field == 'account') or (related_id is not None and database.get(model, related_id) is None):
@@ -253,6 +256,7 @@ async def delete_income(income_id: int, database: Session = Depends(get_db)):
         attr.key: getattr(db_income, attr.key)
         for attr in db_income.__mapper__.column_attrs
     }
+    database.query(OccurrenceAmount).filter_by(entry_id=income_id).delete()
     database.delete(db_income)
     database.commit()
     return deleted_income

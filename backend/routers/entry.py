@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 from pydantic_classes import *
 from sql_alchemy import *
+from sql_alchemy import OccurrenceAmount
 from database import get_db, integrity_error_detail
 from bal_stdlib import *
 
@@ -120,6 +121,7 @@ async def bulk_delete_entry(ids: list[int], database: Session = Depends(get_db))
             conflict = entry_delete_conflict(db_entry)
             if conflict:
                 raise HTTPException(status_code=409, detail="Cannot delete Entry " + str(item_id) + ": " + conflict)
+            database.query(OccurrenceAmount).filter_by(entry_id=item_id).delete()
             database.delete(db_entry)
             deleted_count += 1
         else:
@@ -138,6 +140,8 @@ async def update_entry(entry_id: int, entry_data: EntryCreate, database: Session
     db_entry = database.query(Entry).filter(Entry.id == entry_id).first()
     if db_entry is None:
         raise HTTPException(status_code=404, detail="Entry not found")
+    if isinstance(db_entry, (Income, Expense)):
+        raise HTTPException(status_code=422, detail='Edit income or expenses on their own page to preserve type and recurrence rules')
 
     setattr(db_entry, 'amount', entry_data.amount)
     setattr(db_entry, 'description', entry_data.description)
@@ -188,6 +192,7 @@ async def delete_entry(entry_id: int, database: Session = Depends(get_db)):
         attr.key: getattr(db_entry, attr.key)
         for attr in db_entry.__mapper__.column_attrs
     }
+    database.query(OccurrenceAmount).filter_by(entry_id=entry_id).delete()
     database.delete(db_entry)
     database.commit()
     return deleted_entry

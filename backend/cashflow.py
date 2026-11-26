@@ -5,7 +5,7 @@ from datetime import date
 from decimal import Decimal
 
 from sqlalchemy.orm import Session
-from sql_alchemy import Account, Entry, Transfer
+from sql_alchemy import Account, Entry, Expense, OccurrenceAmount, Transfer
 
 
 def add_months(day: date, months: int) -> date:
@@ -81,6 +81,7 @@ def project(
         if account_ids
         else []
     )
+    overrides = {(item.entry_id, item.date): item.amount for item in database.query(OccurrenceAmount).filter(OccurrenceAmount.entry_id.in_([entry.id for entry in entries])).all()} if entries else {}
     buckets = [dict(income=Decimal("0"), spending=Decimal("0")) for _ in range(months)]
     for entry in entries:
         account = next(a for a in accounts if a.id == entry.account_id)
@@ -90,7 +91,10 @@ def project(
             index = (day.year - today.year) * 12 + day.month - today.month
             if 0 <= index < months:
                 key = "spending" if entry.type_spec == "expense" else "income"
-                buckets[index][key] += Decimal(str(entry.amount))
+                expected = (entry.expectedValue if isinstance(entry, Expense)
+                            and entry.expenseType.value == "VARIABLE"
+                            and day != entry.startDate else entry.amount)
+                buckets[index][key] += Decimal(str(overrides.get((entry.id, day), expected)))
     transfers = (
         database.query(Transfer).filter(
             (Transfer.fromAccount_id.in_(account_ids)) | (Transfer.toAccount_id.in_(account_ids))

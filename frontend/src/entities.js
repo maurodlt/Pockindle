@@ -25,8 +25,11 @@ export const entities = {
   ] },
   entry: { label: 'All entries', singular: 'Entry', fields: entryFields, readOnlyCreate: true },
   expense: { label: 'Expenses', singular: 'Expense', fields: [...entryFields,
-    { name: 'expenseType', label: 'Expense type', type: 'enum', options: ['FIX', 'VARIABLE', 'EXTRAORDINARY'], required: true }] },
-  income: { label: 'Income', singular: 'Income', fields: entryFields }
+    { name: 'expenseType', label: 'Expense type', type: 'enum', options: ['FIX', 'VARIABLE', 'EXTRAORDINARY'], required: true },
+    { name: 'expectedValue', label: 'Expected value', type: 'number', min: '0.01', conditional: 'VARIABLE' },
+    { name: 'allowedDeviation', label: 'Acceptable deviation (±)', type: 'number', min: '0', conditional: 'VARIABLE' }] },
+  income: { label: 'Income', singular: 'Income', fields: [...entryFields,
+    { name: 'incomeType', label: 'Income type', type: 'enum', options: ['FIXED', 'VARIABLE', 'EXTRAORDINARY'], required: true }] }
 }
 export const today = () => new Date().toLocaleDateString('en-CA')
 export function initialValues(entity) {
@@ -35,7 +38,7 @@ export function initialValues(entity) {
     field.type === 'enum' ? field.options[0] : '']))
 }
 export function payload(entity, values) {
-  return Object.fromEntries(entities[entity].fields.map(field => {
+  return Object.fromEntries(entities[entity].fields.filter(field => !field.conditional || values.expenseType === field.conditional).map(field => {
     let value = values[field.name]
     if (field.type === 'number') value = value === '' ? null : Number(value)
     if (field.type === 'reference') value = value === '' ? null : Number(value)

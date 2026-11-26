@@ -7,9 +7,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from pydantic_classes import *
 from sql_alchemy import *
+from sql_alchemy import OccurrenceAmount
 from database import get_db, integrity_error_detail
 from datetime import date
-from cashflow import project
+from cashflow import project, occurrences
+from monthly import router as monthly_router
 from routers import entry as entry_router
 from routers import revenue as income_router
 from routers import expense as expense_router
@@ -149,6 +151,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 #
 ############################################
 
+app.include_router(monthly_router)
 app.include_router(entry_router.router)
 app.include_router(income_router.router)
 app.include_router(expense_router.router)
@@ -255,12 +258,13 @@ def dashboard(months: int = 6, database: Session = Depends(get_db)):
             'futureMonthSpending': sum(m['spending'] for m in projection[1:]),
             'averageMonthlySpending': round(sum(m['spending'] for m in projection) / months, 2),
         }
-    from cashflow import occurrences, month_end, add_months
+    from cashflow import month_end
     from decimal import Decimal
     first = date.today().replace(day=1)
     last = month_end(first)
     categories = {category.id: category.name for category in database.query(Category).all()}
     entries = database.query(Entry).all()
+    overrides = {(item.entry_id, item.date): item.amount for item in database.query(OccurrenceAmount).all()}
     for currency, summary in by_currency.items():
         selected = [a for a in accounts if a.currency == currency]
         summary['accounts'] = [
@@ -282,7 +286,7 @@ def dashboard(months: int = 6, database: Session = Depends(get_db)):
             if count:
                 name = categories.get(entry.category_id, 'Uncategorized')
                 amounts = chart[entry.type_spec]
-                amounts[name] = amounts.get(name, Decimal('0')) + Decimal(str(entry.amount)) * count
+                amounts[name] = amounts.get(name, Decimal('0')) + sum((Decimal(str(overrides.get((entry.id, day), entry.amount))) for day in occurrences(entry, max(first, account.openingBalanceDate), last)), Decimal('0'))
         summary['categories'] = {
             kind: [{'name': name, 'amount': float(amount)} for name, amount in sorted(values.items())]
             for kind, values in chart.items()

@@ -95,6 +95,7 @@ class Entry(Base):
 class Income(Entry):
     __tablename__ = "revenue"  # Keep existing records in place.
     id: Mapped_[int] = mapped_column(ForeignKey_("entry.id"), primary_key=True)
+    incomeType: Mapped_[str] = mapped_column(String_(20), default='EXTRAORDINARY', nullable=False)
     __mapper_args__ = {
         "polymorphic_identity": "income",
     }
@@ -103,9 +104,18 @@ class Expense(Entry):
     __tablename__ = "expense"
     id: Mapped_[int] = mapped_column(ForeignKey_("entry.id"), primary_key=True)
     expenseType: Mapped_[ExpenseType] = mapped_column(Enum(ExpenseType))
+    expectedValue: Mapped_[Optional_[float]] = mapped_column(Float_, nullable=True)
+    allowedDeviation: Mapped_[Optional_[float]] = mapped_column(Float_, nullable=True)
     __mapper_args__ = {
         "polymorphic_identity": "expense",
     }
+
+class OccurrenceAmount(Base):
+    __tablename__ = 'occurrence_amount'
+    entry_id: Mapped_[int] = mapped_column(ForeignKey_("entry.id", ondelete="CASCADE"), primary_key=True)
+    date: Mapped_[dt_date] = mapped_column(Date_, primary_key=True)
+    amount: Mapped_[float] = mapped_column(Float_, nullable=False)
+
 
 class Transfer(Base):
     __tablename__ = "transfer"

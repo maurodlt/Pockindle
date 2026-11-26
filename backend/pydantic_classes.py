@@ -47,12 +47,41 @@ class EntryCreate(ABC, BaseModel):
         return self
 
 
+class IncomeType(str, Enum):
+    FIXED = 'FIXED'
+    VARIABLE = 'VARIABLE'
+    EXTRAORDINARY = 'EXTRAORDINARY'
+
+
 class IncomeCreate(EntryCreate):
-    pass
+    incomeType: IncomeType = IncomeType.EXTRAORDINARY
+
+    @model_validator(mode='after')
+    def recurring_income_interval(self):
+        if self.incomeType in (IncomeType.FIXED, IncomeType.VARIABLE) and self.recurrenceIntervalMonths is None:
+            raise ValueError('Fixed and variable income require a repeat interval in months')
+        return self
 
 
 class ExpenseCreate(EntryCreate):
     expenseType: ExpenseType
+    expectedValue: Optional[float] = None
+    allowedDeviation: Optional[float] = None
+
+    @model_validator(mode='after')
+    def expense_rules(self):
+        if self.expenseType in (ExpenseType.FIX, ExpenseType.VARIABLE) and self.recurrenceIntervalMonths is None:
+            raise ValueError('Fixed and variable expenses require Repeat every x months')
+        if self.expenseType == ExpenseType.VARIABLE:
+            if self.expectedValue is None or self.allowedDeviation is None:
+                raise ValueError('Variable expenses require expected value and allowed deviation')
+            if not 0 < self.expectedValue < float('inf') or not 0 <= self.allowedDeviation < float('inf'):
+                raise ValueError('Expected value must be positive and deviation must be nonnegative and finite')
+            if not self.expectedValue - self.allowedDeviation <= self.amount <= self.expectedValue + self.allowedDeviation:
+                raise ValueError('Initial amount must be within expected value ± allowed deviation')
+        elif self.expectedValue is not None or self.allowedDeviation is not None:
+            raise ValueError('Expected value and deviation apply only to variable expenses')
+        return self
 
 
 class TransferCreate(BaseModel):

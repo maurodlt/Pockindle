@@ -74,6 +74,14 @@ def init_db():
             # Rename the discriminator and category kind without replacing existing data.
             connection.exec_driver_sql("UPDATE entry SET type_spec='income' WHERE type_spec='revenue'")
             connection.exec_driver_sql("UPDATE category SET kind='income' WHERE kind='revenue'")
+            income_columns = {col[1] for col in connection.exec_driver_sql('PRAGMA table_info(revenue)')}
+            if 'incomeType' not in income_columns:
+                connection.exec_driver_sql("ALTER TABLE revenue ADD COLUMN \"incomeType\" VARCHAR(20) NOT NULL DEFAULT 'EXTRAORDINARY'")
+            expense_columns = {col[1] for col in connection.exec_driver_sql('PRAGMA table_info(expense)')}
+            if 'expectedValue' not in expense_columns:
+                connection.exec_driver_sql('ALTER TABLE expense ADD COLUMN "expectedValue" FLOAT')
+            if 'allowedDeviation' not in expense_columns:
+                connection.exec_driver_sql('ALTER TABLE expense ADD COLUMN "allowedDeviation" FLOAT')
             transfer_columns = {col[1] for col in connection.exec_driver_sql('PRAGMA table_info(transfer)')}
             if 'recurrenceIntervalMonths' not in transfer_columns:
                 connection.exec_driver_sql('ALTER TABLE transfer ADD COLUMN "recurrenceIntervalMonths" INTEGER')

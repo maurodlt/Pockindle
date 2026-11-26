@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 from pydantic_classes import *
 from sql_alchemy import *
+from sql_alchemy import OccurrenceAmount
 from database import get_db, integrity_error_detail
 from bal_stdlib import *
 
@@ -122,7 +123,7 @@ async def create_expense(expense_data: ExpenseCreate, database: Session = Depend
             raise HTTPException(status_code=422, detail='Expense requires an expense category')
 
     db_expense = Expense(
-        amount=expense_data.amount,        description=expense_data.description,        endDate=expense_data.endDate,        recurrenceIntervalMonths=expense_data.recurrenceIntervalMonths,        startDate=expense_data.startDate,        expenseType=expense_data.expenseType.name,        account_id=expense_data.account,        category_id=expense_data.category        )
+        amount=expense_data.amount,        description=expense_data.description,        endDate=expense_data.endDate,        recurrenceIntervalMonths=expense_data.recurrenceIntervalMonths,        startDate=expense_data.startDate,        expenseType=expense_data.expenseType.name,        expectedValue=expense_data.expectedValue,        allowedDeviation=expense_data.allowedDeviation,        account_id=expense_data.account,        category_id=expense_data.category        )
 
     database.add(db_expense)
     database.flush()
@@ -154,7 +155,7 @@ async def bulk_create_expense(items: list[ExpenseCreate], database: Session = De
                 raise ValueError('Expense requires an expense category')
 
             db_expense = Expense(
-                amount=item_data.amount,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                expenseType=item_data.expenseType.name,                account_id=item_data.account,                category_id=item_data.category            )
+                amount=item_data.amount,                description=item_data.description,                endDate=item_data.endDate,                recurrenceIntervalMonths=item_data.recurrenceIntervalMonths,                startDate=item_data.startDate,                expenseType=item_data.expenseType.name,                expectedValue=item_data.expectedValue,                allowedDeviation=item_data.allowedDeviation,                account_id=item_data.account,                category_id=item_data.category            )
             database.add(db_expense)
             database.flush()  # Get ID without committing
             created_items.append(db_expense.id)
@@ -190,6 +191,7 @@ async def bulk_delete_expense(ids: list[int], database: Session = Depends(get_db
             conflict = expense_delete_conflict(db_expense)
             if conflict:
                 raise HTTPException(status_code=409, detail="Cannot delete Expense " + str(item_id) + ": " + conflict)
+            database.query(OccurrenceAmount).filter_by(entry_id=item_id).delete()
             database.delete(db_expense)
             deleted_count += 1
         else:
@@ -215,6 +217,8 @@ async def update_expense(expense_id: int, expense_data: ExpenseCreate, database:
     setattr(db_expense, 'recurrenceIntervalMonths', expense_data.recurrenceIntervalMonths)
     setattr(db_expense, 'startDate', expense_data.startDate)
     setattr(db_expense, 'expenseType', expense_data.expenseType.name)
+    setattr(db_expense, 'expectedValue', expense_data.expectedValue)
+    setattr(db_expense, 'allowedDeviation', expense_data.allowedDeviation)
     for field, model in [('account', Account), ('category', Category)]:
         related_id = getattr(expense_data, field)
         if (related_id is None and field == 'account') or (related_id is not None and database.get(model, related_id) is None):
@@ -254,6 +258,7 @@ async def delete_expense(expense_id: int, database: Session = Depends(get_db)):
         attr.key: getattr(db_expense, attr.key)
         for attr in db_expense.__mapper__.column_attrs
     }
+    database.query(OccurrenceAmount).filter_by(entry_id=expense_id).delete()
     database.delete(db_expense)
     database.commit()
     return deleted_expense
